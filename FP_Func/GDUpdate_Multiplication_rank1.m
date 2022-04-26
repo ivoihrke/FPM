@@ -26,6 +26,7 @@ downsamp = @(x) x(n1(1):n2(1),n1(2):n2(2));
 
 O1 = downsamp(O);
 
+%Fig. 3 O-and P-updates for 1 LED
 O(n1(1):n2(1),n1(2):n2(2)) = O(n1(1):n2(1),n1(2):n2(2))...
     + step_size * 1/max(max(abs(P)))*abs(P).*conj(P).*dpsi./(abs(P).^2+alpha);
 P = P+1/Omax*(abs(O1).*conj(O1)).*dpsi./(abs(O1).^2+beta).*Ps;

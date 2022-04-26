@@ -26,6 +26,8 @@ dO = zeros(No(1),No(2));
 dP = 0;
 sumP = zeros(No(1),No(2));
 sumO = 0;
+
+%Fig. 3 O and P-update for r LEDs
 for m = 1:r
     % operator to put P at proper location at the O plane
     n1 = cen(:,m)-floor(Np/2);
