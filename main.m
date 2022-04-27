@@ -21,15 +21,14 @@
 
 %% Reconstruction library locates here
 %clear all;
-addpath(['./FP_Func']);
-addpath('natsortfiles');
+addpath('../dependencies/natsortfiles');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO 1: specify the file directory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Multiplex image directory
-filedir = ['../data/'];
+filedir = ['../data/Tian14/1LED/tif/'];
 % Generate the image list, in 'tif' image format (depending on your image format)
 imglist = dir([filedir,'*.tif']);
 nstart = [100, 100];
@@ -92,7 +91,8 @@ Np = 344;
 
 %% read system parameters
 % USAF_Parameter();
-U2OS_Parameter();
+%U2OS_Parameter();
+test_setup();
 %% load in data: read in the patch from the memory
 Imea = double(Iall(nstart(1):nstart(1)+Np-1,nstart(2):nstart(2)+Np-1,:));
 
