@@ -1,4 +1,5 @@
 function [O, P, err, scale, Ns] = AlterMin( I, No, Ns, opts)
+fprintf('in the AlteMin fnc\n');
 %AlterMin Implements alternating minimization sequentially on a stack of
 %measurement I (n1 x n2 x nz). It consists of 2 loop. The main loop update
 %the reconstruction results O and P. the inner loop applies projectors/minimizers
@@ -189,7 +190,7 @@ if opts.display
     elseif strcmp(opts.mode,'fourier')
         o = Ft(O);
     end
-    f1 = figure(88);
+    f88 = figure(88);
     subplot(221); imagesc(abs(o)); axis image; colormap gray; colorbar;
     title('ampl(o)');
     subplot(222); imagesc(angle(o)); axis image; colormap gray; colorbar;
@@ -201,8 +202,9 @@ if opts.display
     drawnow;
 end
 
+f1 = figure(88);
 if opts.saveIterResult %set this to activate intermediate output saving - need to use in conjunction with opts.display
-    export_fig(f1,[opts.out_dir,'\R_',num2str(iter),'.png'],'-m4');
+    export_fig(f1,[opts.out_dir,'R_',num2str(iter),'.png'],'-m4');
 end
 
 
@@ -219,6 +221,7 @@ sp0 = max(row(abs(Ns(:,1,:)-Ns(:,2,:))));
 
 while abs(err1-err2)>opts.tol&&iter<opts.maxIter
 %     psistack = zeros(64,64,293);
+    fprintf('iter: %d \n', iter);
     err1 = err2;
     err2 = 0;
     iter = iter+1;   
@@ -288,17 +291,18 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
 
         % compute the total difference to determine stopping criterion
         err2 = err2+sqrt(sum(sum((I_mea-I_est).^2)));
-        
-    end
+    end %end of Nimg loop
+    
     if strcmp(opts.display,'full')
         if strcmp(opts.mode,'real')
             o = O;
         elseif strcmp(opts.mode,'fourier')
             o = Ft(O);
         end
-        f1 = figure(88);
+        f88 = figure(88);
         subplot(221); imagesc(abs(o)); axis image; colormap gray; colorbar;
         title('ampl(o)');
+        %fprintf('here units is: %2s %d\n',f1.Units);
         subplot(222); imagesc(angle(o)); axis image; colormap gray; colorbar;
         title('phase(o)');
         subplot(223); imagesc(abs(P)); axis image; colormap gray; colorbar;
@@ -319,7 +323,6 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         elseif strcmp(opts.mode,'fourier')
             o = Ft(O);
         end
-        f1 = figure(88);
         subplot(221); imagesc(abs(o)); axis image; colormap gray; colorbar;
         title('ampl(o)');
         subplot(222); imagesc(angle(o)); axis image; colormap gray; colorbar;
@@ -332,10 +335,9 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
     end
     
     fprintf('| %2d   | %.2e |\n',iter,err2);
-    
     if opts.saveIterResult
-        export_fig(f1,[opts.out_dir,'\R_',num2str(iter),'.png'],'-m4');
-        %     saveas(f2,[opts.out_dir,'\Ph_',num2str(iter),'.png']);
+        export_fig(f1,[opts.out_dir,'R_',num2str(iter),'.png'],'-m4');
+        %saveas(f2,[opts.out_dir,'Ph_',num2str(iter),'.png']);
     end
     
     if opts.monotone&&iter>opts.minIter

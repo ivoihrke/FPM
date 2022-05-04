@@ -22,6 +22,10 @@
 %% Reconstruction library locates here
 %clear all;
 addpath('../dependencies/natsortfiles');
+addpath('../dependencies/export_fig');
+
+% add path for functions files
+addpath('FP_Func/');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO 1: specify the file directory
@@ -29,6 +33,10 @@ addpath('../dependencies/natsortfiles');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Multiplex image directory
 filedir = ['../data/Tian14/1LED/tif/'];
+%filedir = ['../data/Tian14_ResTarget/1LED/'];
+%filedir = ['../data/Tian15_inVitroHeLa/data/'];
+
+
 % Generate the image list, in 'tif' image format (depending on your image format)
 imglist = dir([filedir,'*.tif']);
 nstart = [100, 100];
@@ -37,7 +45,9 @@ N = natsortfiles({imglist.name});%sorting the images in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO 2: specify output folder
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%out_dir = ['/home/'];
+out_dir = ['../out_dir/'];
+%out_dir = ['../out_dir/Tian14_ResTarget/'];
+%out_dir = ['../out_dir/Out_Tian15_inVitroHeLa/'];
 %mkdir(out_dir);
 
 %% define # of LEDs used to capture each image
@@ -93,6 +103,7 @@ Np = 344;
 % USAF_Parameter();
 %U2OS_Parameter();
 test_setup();
+%test_setup_tian15_invitrohela();
 %% load in data: read in the patch from the memory
 Imea = double(Iall(nstart(1):nstart(1)+Np-1,nstart(2):nstart(2)+Np-1,:));
 
@@ -189,13 +200,16 @@ opts.monotone = 1;
 % 'iter', display only results from outer loop
 % 0, no display
 opts.display = 'full';%0;%'iter';
+opts.out_dir = out_dir
+
 upsamp = @(x) padarray(x,[(N_obj-Np)/2,(N_obj-Np)/2]);
 opts.O0 = F(sqrt(I(:,:,1)));
 opts.O0 = upsamp(opts.O0);
 opts.P0 = w_NA;
 opts.Ps = w_NA;
 opts.iters = 1;
-opts.mode = 'fourier';
+%opts.mode = 'fourier';
+opts.mode = 'real';
 opts.scale = ones(Nused,1);
 opts.OP_alpha = 1;
 opts.OP_beta = 1e3 ;
@@ -204,6 +218,8 @@ opts.calbratetol = 1e-1;
 opts.F = F;
 opts.Ft = Ft;
 opts.StepSize = 0.1;
+opts.saveIterResult = 1;
+f88 = [];
 %% algorithm starts
 [O,P,err_pc,c,Ns_cal] = AlterMin(I,[N_obj,N_obj],round(Ns2),opts);
 
@@ -211,13 +227,30 @@ opts.StepSize = 0.1;
 fn = ['RandLit-',num2str(numlit),'-',num2str(Nused)];
 %save([out_dir,'\',fn],'O','P','err_pc','c','Ns_cal');
 
-%f1 = figure; imagesc(-angle(O),[-.6,1]); axis image; colormap gray; axis off
+%f1 = figure; imagesc(-angle(O),[-.6,1]); axis image; colormap gray; axis off 
 
-fprintf('processing completes\n');
+I = mat2gray(real(O));
+f1 = figure(1);imshow(I);
+title('Spatial (O)')
+temp=[out_dir,filesep,'spatial_O.png'];
+saveas(gca,temp);
 
-%I = mat2gray(real(O));
-%figure(2);imshow(I);
+f2 = figure(2);imshow(angle(O),[]);
+title('Spatial angle(O)')
+temp=[out_dir,filesep,'spatial_angle_O.png'];
+saveas(gca,temp);
 
-figure(2);imshow(angle(O),[]);
-figure(1);imshow(abs(O),[])
+f3 = figure(3);imshow(abs(O),[])
+title('Spatial abs(O)')
+temp=[out_dir,filesep,'spatial_abs_O.png'];
+saveas(gca,temp);
+
+f4 = figure(4); h=barh(err_pc)
+title('err/iter')
+xlabel('err')
+ylabel('iter')
+temp=[out_dir,filesep,'err.png'];
+saveas(gca,temp);
+
 % figure(3);imagesc(-angle(O));colormap gray;
+fprintf('processing completes\n');

@@ -15,12 +15,12 @@ row = @(x) x(:).';
 % G: 518.0nm +- 50nm
 % B: 476.4nm +- 50nm
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-lambda = 0.6292;
+lambda = 0.514;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % numerical aperture of the objective
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-NA = 0.1;
+NA = 0.2;
 % maximum spatial frequency set by NA
 um_m = NA/lambda;
 % system resolution based on the NA
@@ -101,7 +101,7 @@ ds_led = 4e3; %4mm
 % distance from the LED to the object
 % experientally determined by placing a grating object
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-z_led = 67.5e3;
+z_led = 64e3;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % diameter of # of LEDs used in the experiment
@@ -112,8 +112,8 @@ dia_led = 19;
 % set up LED coordinates
 % h: horizontal, v: vertical
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-lit_cenv = 13;
-lit_cenh = 14;
+lit_cenv = 16;
+lit_cenh = 16;
 vled = [0:31]-lit_cenv;
 hled = [0:31]-lit_cenh;
 
