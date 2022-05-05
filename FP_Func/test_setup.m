@@ -114,23 +114,26 @@ dia_led = 19;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 lit_cenv = 13;
 lit_cenh = 14;
-vled = [0:31]-lit_cenv;
-hled = [0:31]-lit_cenh;
+vled = [0:31]-lit_cenv; % -13:18
+hled = [0:31]-lit_cenh; % -14:17
 
-[hhled,vvled] = meshgrid(hled,vled);
+[hhled,vvled] = meshgrid(hled,vled); %32x32 meshgrid of LEDs
 rrled = sqrt(hhled.^2+vvled.^2);
-LitCoord = rrled<dia_led/2;
+LitCoord = rrled<dia_led/2; % the 32x32 would have a shape of an ellipse of 293 elements filled with ones and zeros otherwise!
 % total number of LEDs used in the experiment
 Nled = sum(LitCoord(:));
 % index of LEDs used in the experiment
-Litidx = find(LitCoord);
+Litidx = find(LitCoord); %find index of the 293 LEDs that were used (with value of one!) in the 32x32 grid!
+                          % CAVEAT: it searches vertically column by
+                          % column!!!!
 
 % corresponding angles for each LEDs
-dd = sqrt((-hhled*ds_led-img_center(1)).^2+(-vvled*ds_led-img_center(2)).^2+z_led.^2);
+dd = sqrt((-hhled*ds_led-img_center(1)).^2+(-vvled*ds_led-img_center(2)).^2+z_led.^2); %dd is modulus of a vector from illumination plane to image plane
+                                                                                       %where image plane is placed at the Object and it is at angle with the optical axis!
 sin_thetav = (-hhled*ds_led-img_center(1))./dd;
 sin_thetah = (-vvled*ds_led-img_center(2))./dd;
 
-illumination_na = sqrt(sin_thetav.^2+sin_thetah.^2);
+illumination_na = sqrt(sin_thetav.^2+sin_thetah.^2); % a 32x32 array of NA for each LED
 % corresponding spatial freq for each LEDs
 %
 vled = sin_thetav/lambda;
@@ -139,7 +142,7 @@ uled = sin_thetah/lambda;
 idx_u = round(uled/du);
 idx_v = round(vled/du);
 
-illumination_na_used = illumination_na(LitCoord);
+illumination_na_used = illumination_na(LitCoord); %a vector of NA for each of the 293 used LEDs
 
 % number of brightfield image
 NBF = sum(illumination_na_used<NA);
