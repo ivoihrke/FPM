@@ -29,7 +29,7 @@ addpath('natsortfiles');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Multiplex image directory
-filedir = ['../data/'];
+filedir = ['../../data/Tian14_ResTarget/1LED/'];
 % Generate the image list, in 'tif' image format (depending on your image format)
 imglist = dir([filedir,'*.tif']);
 nstart = [100, 100];
@@ -86,13 +86,13 @@ fprintf(['\nfinish loading images\n']);
 toc;
 
 %% define processing ROI
-Np = 344;
+Np = 1000;
 % nstart = [1,1];
 
 
 %% read system parameters
-% USAF_Parameter();
-U2OS_Parameter();
+USAF_Parameter();
+% U2OS_Parameter();
 %% load in data: read in the patch from the memory
 Imea = double(Iall(nstart(1):nstart(1)+Np-1,nstart(2):nstart(2)+Np-1,:));
 
@@ -182,8 +182,8 @@ Ns2 = Ns_reorder(:,idx_used,:);
     % caution: takes consierably much longer time to compute a single iteration
 %   F, Ft: operators of Fourier transform and inverse
 opts.tol = 1;
-opts.maxIter = 10; 
-opts.minIter = 2;
+opts.maxIter = 20; 
+opts.minIter = 20;
 opts.monotone = 1;
 % 'full', display every subroutin,
 % 'iter', display only results from outer loop
