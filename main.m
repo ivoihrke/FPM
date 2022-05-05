@@ -134,24 +134,36 @@ saveas(gca,temp);
 
 ledidx = 1:Nled;
 ledidx = reshape(ledidx,numlit,Nimg);
-lit = Litidx(ledidx); %index of LEDs that were used in experiment corresponding to the 293 LEDs in the 32x32 grid!
+lit = Litidx(ledidx); %index of the sequence of LEDs that were used in experiment corresponding to the 293 LEDs in the 32x32 grid!
 lit = reshape(lit,numlit,Nimg);
 % reorder LED indices based on illumination NA
-[dis_lit2,idx_led] = sort(reshape(illumination_na_used,1,Nled)); %reshape NA of the 293 LEDs to be a vector from 1:293 and sort them while saving their original indices!
-                                                                                                                                  
-Nsh_lit = zeros(numlit,Nimg);
+[dis_lit2,idx_led] = sort(reshape(illumination_na_used,1,Nled)); %reshape NA of the 293 LEDs to be a vector from 1:293 and sort them while saving their NA-indices to idx_led!
+                                                                 %i.e., idx_led is the NA-indicies
+                                                                 % while dis_lit2 is
+                                                                 % the NA-values
+                                                                 
+Nsh_lit = zeros(numlit,Nimg); % a vector (in case of numlit==1) of size Nimg==293
 Nsv_lit = zeros(numlit,Nimg);
 
 for m = 1:Nimg
     % corresponding index of spatial freq for the LEDs are lit
-    lit0 = lit(:,m);
-    Nsh_lit(:,m) = idx_u(lit0);
-    Nsv_lit(:,m) = idx_v(lit0);
+    lit0 = lit(:,m); %read index of sequence of LEDs that were used in experiment for each image
+                     %in case of 1 LED sequence; lit0 just stores the
+                     %index of that LED that was on for the corresponding
+                     %image!
+                     %Therefore, for that image, which LED was on!!
+                     
+    % this is a translation from the LED plane represented by lit0 or lit
+    % to the image/object plane represented by idx_u and idx_v
+    Nsh_lit(:,m) = idx_u(lit0); % for the LED that was on, get dirac peak position in u-coordinate (of the horizontal) relative to the center of image
+    Nsv_lit(:,m) = idx_v(lit0); % for the LED that was on, get dirac peak position in v-coordinate (of the vertical) relative to the center of image
 end
 
 % reorder the LED indices and intensity measurements according the previous
 % dis_lit
-Ns = [];
+% THIS IS WRONG!!!
+% THERE IS NO USE OF dis_lit,
+Ns = []; % 3D array where for each LED, the corresponding index of k_u and index of k_v are to be stored
 Ns(:,:,1) = Nsv_lit;
 Ns(:,:,2) = Nsh_lit;
 
@@ -190,7 +202,15 @@ saveas(gca,temp);
 %load('C:\Users\Muneeb\Desktop\ajmal fpm\laura\multiplexed fpm\Ns_cal289.mat\');
 % Ns_reorder = Ns(:,idx_led,:);
 % Ithresh_reorder = Ithresh_reorder(:,:,1:89);
-Ns_reorder = Ns(:,idx_led,:);
+Ns_reorder = Ns(:,idx_led,:); %why?
+                              % 1st element is empty!
+                              % 3rd element has the indicies of the k_u and k_v
+                              % now store in 2nd element the NA-indicies
+                              % idx_led is the NA-indices, e.g.
+                              % idx_led(1) = 147,
+                              % illumination_na_used(147)=0.035,
+                              % dis_lit2(1)=0.035
+                              % Therefore, for each NA-index, store indicies of the corresponding k_u and k_v
 clear Imea
 %% reconstruction algorithm
 % select the index of images that will be used in the processing
@@ -199,6 +219,12 @@ idx_used = 1:Nused;
 I = Ithresh_reorder(:,:,idx_used);
 Ns2 = Ns_reorder(:,idx_used,:);
 
+
+I_input_to_AlterMin_uint16 = uint16(Ithresh_reorder(:,:,5))
+f_test = figure('visible','off');imshow(I_input_to_AlterMin_uint16);
+title('img of I_input_to_AlterMin, old_index==128, reordered_index==5; patched into 344x344')
+temp=[out_dir,filesep,'I_input_to_AlterMin_index_128.png'];
+saveas(gca,temp);
 
 
 

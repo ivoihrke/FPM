@@ -128,6 +128,7 @@ Litidx = find(LitCoord); %find index of the 293 LEDs that were used (with value 
                           % column!!!!
 
 % corresponding angles for each LEDs
+% i.e. at image/object plane
 dd = sqrt((-hhled*ds_led-img_center(1)).^2+(-vvled*ds_led-img_center(2)).^2+z_led.^2); %dd is modulus of a vector from illumination plane to image plane
                                                                                        %where image plane is placed at the Object and it is at angle with the optical axis!
 sin_thetav = (-hhled*ds_led-img_center(1))./dd;
@@ -135,10 +136,12 @@ sin_thetah = (-vvled*ds_led-img_center(2))./dd;
 
 illumination_na = sqrt(sin_thetav.^2+sin_thetah.^2); % a 32x32 array of NA for each LED
 % corresponding spatial freq for each LEDs
-%
+% i.e at image/object plane
 vled = sin_thetav/lambda;
 uled = sin_thetah/lambda;
-% spatial freq index for each plane wave relative to the center
+% spatial freq index for each plane wave relative to the center (dirac peak positions!!!)
+% here by center, this is the center of image, i.e. we're at the
+% image/object plane
 idx_u = round(uled/du);
 idx_v = round(vled/du);
 
