@@ -190,7 +190,7 @@ if opts.display
     elseif strcmp(opts.mode,'fourier')
         o = Ft(O);
     end
-    f88 = figure('visible','off');
+    f5 = figure('visible','off');
     subplot(221); imagesc(abs(o)); axis image; colormap gray; colorbar;
     title('ampl(o)');
     subplot(222); imagesc(angle(o)); axis image; colormap gray; colorbar;
@@ -202,9 +202,8 @@ if opts.display
     drawnow;
 end
 
-f1 = figure('visible','off');
 if opts.saveIterResult %set this to activate intermediate output saving - need to use in conjunction with opts.display
-    export_fig(f1,[opts.out_dir,'R_',num2str(iter),'.png'],'-m4');
+    export_fig(f5,[opts.out_dir,'R_',num2str(iter),'_',opts.mode,'.png'],'-m4');
 end
 
 
@@ -299,7 +298,7 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         elseif strcmp(opts.mode,'fourier')
             o = Ft(O);
         end
-        f88 = figure('visible','off');
+        f6 = figure('visible','off');
         subplot(221); imagesc(abs(o)); axis image; colormap gray; colorbar;
         title('ampl(o)');
         %fprintf('here units is: %2s %d\n',f1.Units);
@@ -336,7 +335,7 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
     
     fprintf('| %2d   | %.2e |\n',iter,err2);
     if opts.saveIterResult
-        export_fig(f1,[opts.out_dir,'R_',num2str(iter),'.png'],'-m4');
+        export_fig(f6,[opts.out_dir,'R_',num2str(iter),'_',opts.mode,'.png'],'-m4');
         %saveas(f2,[opts.out_dir,'Ph_',num2str(iter),'.png']);
     end
     

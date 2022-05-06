@@ -32,8 +32,8 @@ addpath('FP_Func/');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Multiplex image directory
-filedir = ['../data/Tian14/1LED/tif/'];
-%filedir = ['../data/Tian14_ResTarget/1LED/'];
+%filedir = ['../data/Tian14/1LED/tif/'];
+filedir = ['../data/Tian14_ResTarget/1LED/'];
 %filedir = ['../data/Tian15_inVitroHeLa/data/'];
 
 
@@ -45,8 +45,8 @@ N = natsortfiles({imglist.name});%sorting the images in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO 2: specify output folder
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-out_dir = ['../out_dir/Tian14_StainedHistologySlide/'];
-%out_dir = ['../out_dir/Tian14_ResTarget/'];
+%out_dir = ['../out_dir/Tian14_StainedHistologySlide/'];
+out_dir = ['../out_dir/Tian14_ResTarget/'];
 %out_dir = ['../out_dir/Out_Tian15_inVitroHeLa/'];
 %mkdir(out_dir);
 
@@ -102,7 +102,8 @@ saveas(gca,temp);
 
 
 %% define processing ROI
-Np = 344;
+%Np = 344;
+Np = 1000;
 %Np = 2048;
 
 %nstart = [1,1];
@@ -111,7 +112,8 @@ Np = 344;
 %% read system parameters
 % USAF_Parameter();
 %U2OS_Parameter();
-test_setup();
+%test_setup();
+USAF_Parameter();
 %test_setup_tian15_invitrohela();
 %% load in data: read in the patch from the memory
 Imea = double(Iall(nstart(1):nstart(1)+Np-1,nstart(2):nstart(2)+Np-1,:)); % why arrray 344x344x293??
@@ -253,8 +255,10 @@ saveas(gca,temp);
     % caution: takes consierably much longer time to compute a single iteration
 %   F, Ft: operators of Fourier transform and inverse
 opts.tol = 1;
-opts.maxIter = 10; 
-opts.minIter = 2;
+%opts.maxIter = 10; 
+opts.maxIter = 20; 
+%opts.minIter = 2;
+opts.minIter = 20;
 opts.monotone = 1;
 % 'full', display every subroutin,
 % 'iter', display only results from outer loop
@@ -291,25 +295,25 @@ fn = ['RandLit-',num2str(numlit),'-',num2str(Nused)];
 
 I = mat2gray(real(O));
 f1 = figure('visible','off');imshow(I);
-title('Spatial (O)')
-temp=[out_dir,filesep,'spatial_O.png'];
+title(['(', opts.mode, ')',' (O)'])
+temp=[out_dir,filesep,'O_',opts.mode,'.png'];
 saveas(gca,temp);
 
 f2 = figure('visible','off');imshow(angle(O),[]);
-title('Spatial angle(O)')
-temp=[out_dir,filesep,'spatial_angle_O.png'];
+title(['(', opts.mode, ')',' angle (O)'])
+temp=[out_dir,filesep,'angle_O_',opts.mode,'.png'];
 saveas(gca,temp);
 
 f3 = figure('visible','off');imshow(abs(O),[])
-title('Spatial abs(O)')
-temp=[out_dir,filesep,'spatial_abs_O.png'];
+title(['(', opts.mode, ')',' abs (O)'])
+temp=[out_dir,filesep,'abs_O_',opts.mode,'.png'];
 saveas(gca,temp);
 
 f4 = figure('visible','off'); h=barh(err_pc)
-title('err/iter')
+title(['(', opts.mode, ')', ' err/iter'])
 xlabel('err')
 ylabel('iter')
-temp=[out_dir,filesep,'err.png'];
+temp=[out_dir,filesep,'err_',opts.mode,'.png'];
 saveas(gca,temp);
 
 % figure(3);imagesc(-angle(O));colormap gray;
