@@ -119,7 +119,8 @@ hled = [0:31]-lit_cenh; % -14:17
 
 [hhled,vvled] = meshgrid(hled,vled); %32x32 meshgrid of LEDs
 rrled = sqrt(hhled.^2+vvled.^2);
-LitCoord = rrled<dia_led/2; % the 32x32 would have a shape of an ellipse of 293 elements filled with ones and zeros otherwise!
+LitCoord = rrled<dia_led/2; % the 32x32 would have a shape of a circle of 293 elements filled with ones inside the circle and zeros outside!
+
 % total number of LEDs used in the experiment
 Nled = sum(LitCoord(:));
 % index of LEDs used in the experiment
@@ -135,13 +136,15 @@ sin_thetav = (-hhled*ds_led-img_center(1))./dd;
 sin_thetah = (-vvled*ds_led-img_center(2))./dd;
 
 illumination_na = sqrt(sin_thetav.^2+sin_thetah.^2); % a 32x32 array of NA for each LED
-% corresponding spatial freq for each LEDs
+% corresponding spatial freq for each LED
 % i.e at image/object plane
 vled = sin_thetav/lambda;
 uled = sin_thetah/lambda;
-% spatial freq index for each plane wave relative to the center (dirac peak positions!!!)
+% spatial freq index for each plane wave relative to the center (dirac centers positions in Foruier space)
 % here by center, this is the center of image, i.e. we're at the
 % image/object plane
+% i.e. for any LED, it is the corresponding freq (in FOURIER DOMAIN?)
+% at the Object plane
 idx_u = round(uled/du);
 idx_v = round(vled/du);
 

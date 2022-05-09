@@ -25,6 +25,8 @@ todaysdate = string(datetime('today','Format','dd_MM_yyyy'));
 %clear all;
 addpath('../dependencies/natsortfiles');
 addpath('../dependencies/export_fig');
+addpath('../dependencies/labelpoints');
+
 
 % add path for functions files
 addpath('FP_Func/');
@@ -115,8 +117,8 @@ saveas(gca,temp);
 
 
 %% define processing ROI
-%Np = 344;
-Np = 1000;
+Np = 344;
+%Np = 1000;
 %Np = 2048;
 
 %nstart = [1,1];
@@ -152,10 +154,11 @@ ledidx = reshape(ledidx,numlit,Nimg);
 lit = Litidx(ledidx); %index of the sequence of LEDs that were used in experiment corresponding to the 293 LEDs in the 32x32 grid!
 lit = reshape(lit,numlit,Nimg);
 % reorder LED indices based on illumination NA
-[dis_lit2,idx_led] = sort(reshape(illumination_na_used,1,Nled)); %reshape NA of the 293 LEDs to be a vector from 1:293 and sort them while saving their NA-indices to idx_led!
-                                                                 %i.e., idx_led is the NA-indicies
+[dis_lit2,idx_led] = sort(reshape(illumination_na_used,1,Nled)); %reshape NA of the 293 LEDs to be a vector from 1:293 and sort them so that
+                                                                 %they store SEPARATELY the index and values of the NA after sorting them!
+                                                                 %i.e., idx_led is the SORTED NA-indicies
                                                                  % while dis_lit2 is
-                                                                 % the NA-values
+                                                                 % the SORTED NA-values
                                                                  
 Nsh_lit = zeros(numlit,Nimg); % a vector (in case of numlit==1) of size Nimg==293
 Nsv_lit = zeros(numlit,Nimg);
@@ -175,12 +178,30 @@ for m = 1:Nimg
 end
 
 % reorder the LED indices and intensity measurements according the previous
-% dis_lit
-% THIS IS WRONG!!!
-% THERE IS NO USE OF dis_lit,
+% dis_lit or rather their indices: idx_led
 Ns = []; % 3D array where for each LED, the corresponding index of k_u and index of k_v are to be stored
 Ns(:,:,1) = Nsv_lit;
 Ns(:,:,2) = Nsh_lit;
+
+% Images indexed by LEDs indicies at illumination plane
+f_image_illum_plane = figure('visible','off'); 
+pcolor(LitCoord);
+labelpoints(LitCoord, string(illumination_na_used), 'FontSize', 5);
+title(['Images pattern indexed by LEDs indicies at illumination plane for all 32x32 LEDs/n with their NAs'])
+export_fig(f_image_illum_plane,strcat(opts.out_dir,'image_indexed_pattern_illum_plane.png'),'-m4');
+
+
+%Dirac centers of the 32x32 LEDs
+f_dirac_32 = figure('visible','off'); scatter(idx_u, idx_v);
+title(['Dirac peaks centers at O plane for all 32x32 LEDs'])
+export_fig(f_dirac_32,strcat(opts.out_dir,'dirac_centers_32_32.png'),'-m4');
+
+%Dirac centers of 293 LEDs sorted according to their NA
+f_dirac_293= figure('visible','off'); 
+scatter(Nsh_lit, Nsv_lit)
+labelpoints(Nsh_lit, Nsv_lit, string(idx_led), 'FontSize', 5);
+title(['Dirac peaks centers at O plane for all 293 LEDs after NA sorting'])
+export_fig(f_dirac_293,strcat(opts.out_dir,'dirac_centers_293_NA_sorted.png'),'-m4');
 
 Imea_reorder = Imea(:,:,idx_led);
 Ibk_reorder = Ibk(idx_led);
@@ -222,9 +243,10 @@ Ns_reorder = Ns(:,idx_led,:); %why?
                               % 3rd element has the indicies of the k_u and k_v
                               % now store in 2nd element the NA-indicies
                               % idx_led is the NA-indices, e.g.
+                              % for USAF samples, the following:
                               % idx_led(1) = 147,
-                              % illumination_na_used(147)=0.035,
-                              % dis_lit2(1)=0.035
+                              % illumination_na_used(147)=0.0012,
+                              % dis_lit2(1)=0.0012
                               % Therefore, for each NA-index, store indicies of the corresponding k_u and k_v
 clear Imea
 %% reconstruction algorithm
@@ -268,10 +290,10 @@ saveas(gca,temp);
     % caution: takes consierably much longer time to compute a single iteration
 %   F, Ft: operators of Fourier transform and inverse
 opts.tol = 1;
-%opts.maxIter = 10; 
-opts.maxIter = 20; 
-%opts.minIter = 2;
-opts.minIter = 20;
+opts.maxIter = 10; 
+%opts.maxIter = 20; 
+opts.minIter = 2;
+%opts.minIter = 20;
 opts.monotone = 1;
 % 'full', display every subroutin,
 % 'iter', display only results from outer loop
