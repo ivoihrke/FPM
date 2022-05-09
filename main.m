@@ -19,6 +19,8 @@
 % in 'lit'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% use today's date to create new output directory
+todaysdate = string(datetime('today','Format','dd_MM_yyyy'));
 %% Reconstruction library locates here
 %clear all;
 addpath('../dependencies/natsortfiles');
@@ -31,11 +33,17 @@ addpath('FP_Func/');
 %% TODO 1: specify the file directory
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Multiplex image directory
-%filedir = ['../data/Tian14/1LED/tif/'];
-filedir = ['../data/Tian14_ResTarget/1LED/'];
-%filedir = ['../data/Tian15_inVitroHeLa/data/'];
+% specify which sample to use as input
+sample_name= 'USAF'; %'staind', 'USAF', 'hela'
 
+% map container of input directory path to
+% multiplex reading of images
+input_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
+{'../data/Tian14/1LED/tif/';...
+   '../data/Tian14_ResTarget/1LED/';...
+   '../data/Tian15_inVitroHeLa/data/'})
+
+filedir = input_dir_name(sample_name)
 
 % Generate the image list, in 'tif' image format (depending on your image format)
 imglist = dir([filedir,'*.tif']);
@@ -45,10 +53,14 @@ N = natsortfiles({imglist.name});%sorting the images in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO 2: specify output folder
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%out_dir = ['../out_dir/Tian14_StainedHistologySlide/'];
-out_dir = ['../out_dir/Tian14_ResTarget/'];
-%out_dir = ['../out_dir/Out_Tian15_inVitroHeLa/'];
-%mkdir(out_dir);
+% map container of output directory path to
+out_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
+{strcat('../out_dir/Tian14_StainedHistologySlide/',todaysdate,'/');...
+    strcat('../out_dir/Tian14_ResTarget/',todaysdate,'/');...
+    strcat('../out_dir/Out_Tian15_inVitroHeLa/',todaysdate,'/')})
+
+out_dir = out_dir_name(sample_name)
+mkdir(out_dir);
 
 %% define # of LEDs used to capture each image
 numlit = 1;
@@ -97,7 +109,8 @@ toc;
 
 f_test = figure('visible','off');imshow(Iall(:,:,128));
 title('img of Iall, index==128')
-temp=[out_dir,filesep,'Iall_index_128.png'];
+temp = strcat(out_dir,'Iall_index_128.png')
+%temp=[out_dir,filesep,'Iall_index_128.png'];
 saveas(gca,temp);
 
 
@@ -110,11 +123,11 @@ Np = 1000;
 
 
 %% read system parameters
-% USAF_Parameter();
-%U2OS_Parameter();
-%test_setup();
-USAF_Parameter();
-%test_setup_tian15_invitrohela();
+if sample_name == 'USAF'
+    USAF_Parameter();
+else
+    test_setup();
+end    
 %% load in data: read in the patch from the memory
 Imea = double(Iall(nstart(1):nstart(1)+Np-1,nstart(2):nstart(2)+Np-1,:)); % why arrray 344x344x293??
 %Imea = double(Iall(1:n1-1,1:n2-1,:)); % why arrray 344x344x293??
@@ -122,7 +135,7 @@ Imea = double(Iall(nstart(1):nstart(1)+Np-1,nstart(2):nstart(2)+Np-1,:)); % why 
 I_uint16 = uint16(Imea(:,:,128))
 f_test = figure('visible','off');imshow(I_uint16);
 title('img of Imea, index==128; patched into 2048x2048')
-temp=[out_dir,filesep,'Imea_index_128.png'];
+temp=strcat(out_dir,'Imea_index_128.png');
 saveas(gca,temp);
 
 
@@ -175,7 +188,7 @@ Ibk_reorder = Ibk(idx_led);
 I_reordered_uint16 = uint16(Imea_reorder(:,:,5))
 f_test = figure('visible','off');imshow(I_reordered_uint16);
 title('img of Imea_reordered, old_index==128, reordered_index==5; patched into 344x344')
-temp=[out_dir,filesep,'Imea_reodered_index_128.png'];
+temp=strcat(out_dir,'Imea_reodered_index_128.png');
 saveas(gca,temp);
 
 % gain = a(idx_led);
@@ -197,7 +210,7 @@ end
 Ithresh_reorder_uint16 = uint16(Ithresh_reorder(:,:,5))
 f_test = figure('visible','off');imshow(Ithresh_reorder_uint16);
 title('img of Ithresh_reorder, old_index==128, reordered_index==5; patched into 344x344')
-temp=[out_dir,filesep,'Ithresh_reorder_index_128.png'];
+temp=strcat(out_dir,'Ithresh_reorder_index_128.png');
 saveas(gca,temp);
 
 
@@ -225,7 +238,7 @@ Ns2 = Ns_reorder(:,idx_used,:);
 I_input_to_AlterMin_uint16 = uint16(Ithresh_reorder(:,:,5))
 f_test = figure('visible','off');imshow(I_input_to_AlterMin_uint16);
 title('img of I_input_to_AlterMin, old_index==128, reordered_index==5; patched into 344x344')
-temp=[out_dir,filesep,'I_input_to_AlterMin_index_128.png'];
+strcat(out_dir,'I_input_to_AlterMin_index_128.png');
 saveas(gca,temp);
 
 
@@ -272,8 +285,8 @@ opts.O0 = upsamp(opts.O0);
 opts.P0 = w_NA;
 opts.Ps = w_NA;
 opts.iters = 1;
-%opts.mode = 'fourier';
-opts.mode = 'real';
+opts.mode = 'fourier';
+%opts.mode = 'real';
 opts.scale = ones(Nused,1);
 opts.OP_alpha = 1;
 opts.OP_beta = 1e3 ;
@@ -296,24 +309,24 @@ fn = ['RandLit-',num2str(numlit),'-',num2str(Nused)];
 I = mat2gray(real(O));
 f1 = figure('visible','off');imshow(I);
 title(['(', opts.mode, ')',' (O)'])
-temp=[out_dir,filesep,'O_',opts.mode,'.png'];
+strcat(out_dir,'O_',opts.mode,'.png');
 saveas(gca,temp);
 
 f2 = figure('visible','off');imshow(angle(O),[]);
 title(['(', opts.mode, ')',' angle (O)'])
-temp=[out_dir,filesep,'angle_O_',opts.mode,'.png'];
+strcat(out_dir,'angle_O_',opts.mode,'.png');
 saveas(gca,temp);
 
 f3 = figure('visible','off');imshow(abs(O),[])
 title(['(', opts.mode, ')',' abs (O)'])
-temp=[out_dir,filesep,'abs_O_',opts.mode,'.png'];
+strcat(out_dir,'abs_O_',opts.mode,'.png');
 saveas(gca,temp);
 
 f4 = figure('visible','off'); h=barh(err_pc)
 title(['(', opts.mode, ')', ' err/iter'])
 xlabel('err')
 ylabel('iter')
-temp=[out_dir,filesep,'err_',opts.mode,'.png'];
+strcat(out_dir,'err_',opts.mode,'.png');
 saveas(gca,temp);
 
 % figure(3);imagesc(-angle(O));colormap gray;

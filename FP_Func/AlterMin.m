@@ -203,7 +203,7 @@ if opts.display
 end
 
 if opts.saveIterResult %set this to activate intermediate output saving - need to use in conjunction with opts.display
-    export_fig(f5,[opts.out_dir,'R_',num2str(iter),'_',opts.mode,'.png'],'-m4');
+    export_fig(f5,strcat(opts.out_dir,'R_',num2str(iter),'_',opts.mode,'.png'),'-m4');
 end
 
 
@@ -335,7 +335,7 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
     
     fprintf('| %2d   | %.2e |\n',iter,err2);
     if opts.saveIterResult
-        export_fig(f6,[opts.out_dir,'R_',num2str(iter),'_',opts.mode,'.png'],'-m4');
+        export_fig(f6,strcat(opts.out_dir,'R_',num2str(iter),'_',opts.mode,'.png'),'-m4');
         %saveas(f2,[opts.out_dir,'Ph_',num2str(iter),'.png']);
     end
     
