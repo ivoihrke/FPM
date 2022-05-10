@@ -111,10 +111,7 @@ toc;
 
 f_test = figure('visible','off');imshow(Iall(:,:,128));
 title('img of Iall, index==128')
-temp = strcat(out_dir,'Iall_index_128.png')
-%temp=[out_dir,filesep,'Iall_index_128.png'];
-saveas(gca,temp);
-
+export_fig(f_test,strcat(out_dir,'Iall_index_128.png'),'-m4');
 
 %% define processing ROI
 Np = 344;
@@ -134,12 +131,9 @@ end
 Imea = double(Iall(nstart(1):nstart(1)+Np-1,nstart(2):nstart(2)+Np-1,:)); % why arrray 344x344x293??
 %Imea = double(Iall(1:n1-1,1:n2-1,:)); % why arrray 344x344x293??
 
-I_uint16 = uint16(Imea(:,:,128))
-f_test = figure('visible','off');imshow(I_uint16);
+f_test = figure('visible','off');imshow(uint16(Imea(:,:,128)));
 title('img of Imea, index==128; patched into 2048x2048')
-temp=strcat(out_dir,'Imea_index_128.png');
-saveas(gca,temp);
-
+export_fig(f_test,strcat(out_dir,'Imea_index_128.png'),'-m4');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO 5: Define the LED index
@@ -186,31 +180,29 @@ Ns(:,:,2) = Nsh_lit;
 % Images indexed by LEDs indicies at illumination plane
 f_image_illum_plane = figure('visible','off'); 
 pcolor(LitCoord);
-labelpoints(LitCoord, string(illumination_na_used), 'FontSize', 5);
+%labelpoints(LitCoord, string(illumination_na_used), 'FontSize', 5);
 title(['Images pattern indexed by LEDs indicies at illumination plane for all 32x32 LEDs/n with their NAs'])
-export_fig(f_image_illum_plane,strcat(opts.out_dir,'image_indexed_pattern_illum_plane.png'),'-m4');
+export_fig(f_image_illum_plane,strcat(out_dir,'image_indexed_pattern_illum_plane.png'),'-m4');
 
 
 %Dirac centers of the 32x32 LEDs
 f_dirac_32 = figure('visible','off'); scatter(idx_u, idx_v);
 title(['Dirac peaks centers at O plane for all 32x32 LEDs'])
-export_fig(f_dirac_32,strcat(opts.out_dir,'dirac_centers_32_32.png'),'-m4');
+export_fig(f_dirac_32,strcat(out_dir,'dirac_centers_32_32.png'),'-m4');
 
 %Dirac centers of 293 LEDs sorted according to their NA
 f_dirac_293= figure('visible','off'); 
 scatter(Nsh_lit, Nsv_lit)
 labelpoints(Nsh_lit, Nsv_lit, string(idx_led), 'FontSize', 5);
 title(['Dirac peaks centers at O plane for all 293 LEDs after NA sorting'])
-export_fig(f_dirac_293,strcat(opts.out_dir,'dirac_centers_293_NA_sorted.png'),'-m4');
+export_fig(f_dirac_293,strcat(out_dir,'dirac_centers_293_NA_sorted.png'),'-m4');
 
 Imea_reorder = Imea(:,:,idx_led);
 Ibk_reorder = Ibk(idx_led);
 
-I_reordered_uint16 = uint16(Imea_reorder(:,:,5))
-f_test = figure('visible','off');imshow(I_reordered_uint16);
+f_test = figure('visible','off');imshow(uint16(Imea_reorder(:,:,5)));
 title('img of Imea_reordered, old_index==128, reordered_index==5; patched into 344x344')
-temp=strcat(out_dir,'Imea_reodered_index_128.png');
-saveas(gca,temp);
+export_fig(f_test,strcat(out_dir,'Imea_reodered_index_128.png'),'-m4');
 
 % gain = a(idx_led);
 %%
@@ -228,12 +220,9 @@ for m = 1:Nimg
     
 end
 
-Ithresh_reorder_uint16 = uint16(Ithresh_reorder(:,:,5))
-f_test = figure('visible','off');imshow(Ithresh_reorder_uint16);
+f_test = figure('visible','off');imshow(uint16(Ithresh_reorder(:,:,5)));
 title('img of Ithresh_reorder, old_index==128, reordered_index==5; patched into 344x344')
-temp=strcat(out_dir,'Ithresh_reorder_index_128.png');
-saveas(gca,temp);
-
+export_fig(f_test,strcat(out_dir,'Ithresh_reorder_index_128.png'),'-m4');
 
 %load('C:\Users\Muneeb\Desktop\ajmal fpm\laura\multiplexed fpm\Ns_cal289.mat\');
 % Ns_reorder = Ns(:,idx_led,:);
@@ -257,13 +246,9 @@ I = Ithresh_reorder(:,:,idx_used);
 Ns2 = Ns_reorder(:,idx_used,:);
 
 
-I_input_to_AlterMin_uint16 = uint16(Ithresh_reorder(:,:,5))
-f_test = figure('visible','off');imshow(I_input_to_AlterMin_uint16);
+f_test = figure('visible','off');imshow(uint16(Ithresh_reorder(:,:,5)));
 title('img of I_input_to_AlterMin, old_index==128, reordered_index==5; patched into 344x344')
-strcat(out_dir,'I_input_to_AlterMin_index_128.png');
-saveas(gca,temp);
-
-
+export_fig(f_test,strcat(out_dir,'I_input_to_AlterMin_index_128.png'),'-m4');
 
 %% reconstruction algorithm options: opts
 %   tol: maximum change of error allowed in two consecutive iterations
@@ -323,7 +308,7 @@ f88 = [];
 [O,P,err_pc,c,Ns_cal] = AlterMin(I,[N_obj,N_obj],round(Ns2),opts);
 
 %% save results
-fn = ['RandLit-',num2str(numlit),'-',num2str(Nused)];
+%fn = ['RandLit-',num2str(numlit),'-',num2str(Nused)];
 %save([out_dir,'\',fn],'O','P','err_pc','c','Ns_cal');
 
 %f1 = figure; imagesc(-angle(O),[-.6,1]); axis image; colormap gray; axis off 
@@ -331,25 +316,21 @@ fn = ['RandLit-',num2str(numlit),'-',num2str(Nused)];
 I = mat2gray(real(O));
 f1 = figure('visible','off');imshow(I);
 title(['(', opts.mode, ')',' (O)'])
-strcat(out_dir,'O_',opts.mode,'.png');
-saveas(gca,temp);
+export_fig(f1,strcat(out_dir,'O_',opts.mode,'.png'),'-m4');
 
 f2 = figure('visible','off');imshow(angle(O),[]);
 title(['(', opts.mode, ')',' angle (O)'])
-strcat(out_dir,'angle_O_',opts.mode,'.png');
-saveas(gca,temp);
+export_fig(f2,strcat(out_dir,'angle_O_',opts.mode,'.png'),'-m4');
 
 f3 = figure('visible','off');imshow(abs(O),[])
 title(['(', opts.mode, ')',' abs (O)'])
-strcat(out_dir,'abs_O_',opts.mode,'.png');
-saveas(gca,temp);
+export_fig(f3,strcat(out_dir,'abs_O_',opts.mode,'.png'),'-m4');
 
 f4 = figure('visible','off'); h=barh(err_pc)
 title(['(', opts.mode, ')', ' err/iter'])
 xlabel('err')
 ylabel('iter')
-strcat(out_dir,'err_',opts.mode,'.png');
-saveas(gca,temp);
+export_fig(f4,strcat(out_dir,'err_',opts.mode,'.png'),'-m4');
 
 % figure(3);imagesc(-angle(O));colormap gray;
 fprintf('processing completes\n');
