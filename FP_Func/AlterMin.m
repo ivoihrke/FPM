@@ -56,7 +56,9 @@ fprintf('in the AlteMin fnc\n');
 %% derived constants
 % size of measurement
 [Nmy,Nmx,Nimg] = size(I); %size of 3D image stack
-Np = [Nmy,Nmx]; %2D resolution of input images
+Np = [Nmy,Nmx]; %2D resolution of input images 
+                %this is determined from size of Imea in main.m, which is determined
+                %by a symmetric array (which depends on a single integer Np)
 % r0 defines # of LEDs lit up in each pattern
 [r0,~,~] = size(Ns); %#of LEDs that are on
 cen0 = round((No+1)/2);   % the center of the high-resolution FT

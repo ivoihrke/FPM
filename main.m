@@ -20,7 +20,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % use today's date to create new output directory
-todaysdate = string(datetime('today','Format','dd_MM_yyyy'));
+todaysdate = string(datetime('now','Format','dd_MM_yyyy_HH_mm_ss'));
+
+
 %% Reconstruction library locates here
 %clear all;
 addpath('../dependencies/natsortfiles');
@@ -63,6 +65,10 @@ out_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
 
 out_dir = out_dir_name(sample_name)
 mkdir(out_dir);
+
+% keep a log
+diary(strcat(out_dir,'/','log_',todaysdate,'.txt'));
+
 
 %% define # of LEDs used to capture each image
 numlit = 1;
@@ -114,19 +120,23 @@ title('img of Iall, index==128')
 export_fig(f_test,strcat(out_dir,'Iall_index_128.png'),'-m4');
 
 %% define processing ROI
-Np = 344;
+%Np = 344;
 %Np = 1000;
 %Np = 2048;
+Np = 2160;
 
 %nstart = [1,1];
-
 
 %% read system parameters
 if sample_name == 'USAF'
     USAF_Parameter();
 else
     test_setup();
-end    
+end
+
+% overwrite nstart in USAF_Parameter.m
+nstart = [1,1];
+
 %% load in data: read in the patch from the memory
 Imea = double(Iall(nstart(1):nstart(1)+Np-1,nstart(2):nstart(2)+Np-1,:)); % why arrray 344x344x293??
 %Imea = double(Iall(1:n1-1,1:n2-1,:)); % why arrray 344x344x293??
@@ -276,9 +286,10 @@ export_fig(f_test,strcat(out_dir,'I_input_to_AlterMin_index_128.png'),'-m4');
 %   F, Ft: operators of Fourier transform and inverse
 opts.tol = 1;
 opts.maxIter = 10; 
-%opts.maxIter = 20; 
-opts.minIter = 2;
+%opts.maxIter = 20;
+%opts.minIter = 2;
 %opts.minIter = 20;
+opts.minIter = 10;
 opts.monotone = 1;
 % 'full', display every subroutin,
 % 'iter', display only results from outer loop
@@ -297,12 +308,15 @@ opts.mode = 'fourier';
 opts.scale = ones(Nused,1);
 opts.OP_alpha = 1;
 opts.OP_beta = 1e3 ;
-opts.poscalibrate =0;
+opts.poscalibrate =0; % using correction or not
 opts.calbratetol = 1e-1;
 opts.F = F;
 opts.Ft = Ft;
 opts.StepSize = 0.1;
 opts.saveIterResult = 1;
+disp(opts)
+disp(['nstart: ', num2str(nstart)]);
+disp(['Np: ', num2str(Np)]);
 f88 = [];
 %% algorithm starts
 [O,P,err_pc,c,Ns_cal] = AlterMin(I,[N_obj,N_obj],round(Ns2),opts);
