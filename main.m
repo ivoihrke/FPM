@@ -329,34 +329,37 @@ f88 = [];
 
 %f1 = figure; imagesc(-angle(O),[-.6,1]); axis image; colormap gray; axis off 
 
+% add tag for Np + maxIter
+Np_Iter = ['Np_',num2str(Np),'_minIter_',num2str(opts.minIter),'_maxIter_',num2str(opts.maxIter)];
+
 %I = mat2gray(real(O));
 real_O = mat2gray(real(O));
 f1 = figure('visible','off');imshow(real_O);
 title(['(', opts.mode, ')',' (O)']);
-export_fig(f1,strcat(out_dir,'O_',opts.mode,'.png'),'-m4');
+export_fig(f1,strcat(out_dir,'O_',Np_Iter,'_',opts.mode,'.png'),'-m4');
 
 angle_O = angle(O);
 f2 = figure('visible','off');imshow(angle_O,[]);
 title(['(', opts.mode, ')',' angle (O)']);
-export_fig(f2,strcat(out_dir,'angle_O_',opts.mode,'.png'),'-m4');
+export_fig(f2,strcat(out_dir,'angle_O_',Np_Iter,'_',opts.mode,'.png'),'-m4');
 
 abs_O = abs(O);
 f3 = figure('visible','off');imshow(abs_O,[]);
 title(['(', opts.mode, ')',' abs (O)']);
-export_fig(f3,strcat(out_dir,'abs_O_',opts.mode,'.png'),'-m4');
+export_fig(f3,strcat(out_dir,'abs_O_',Np_Iter,'_',opts.mode,'.png'),'-m4');
 
 f4 = figure('visible','off'); h=barh(err_pc);
 title(['(', opts.mode, ')', ' err/iter']);
 xlabel('err');
 ylabel('iter');
-export_fig(f4,strcat(out_dir,'err_',opts.mode,'.png'),'-m4');
+export_fig(f4,strcat(out_dir,'err_',Np_Iter,'_',opts.mode,'.png'),'-m4');
 
 % figure(3);imagesc(-angle(O));colormap gray;
 
 % saving variables to matlab files
-hig_res_O_matfile = fullfile(out_dir, 'hig_res_O.mat');
+hig_res_O_matfile = fullfile(out_dir, ['hig_res_O_',Np_Iter,'_',opts.mode,'.mat']);
 save(hig_res_O_matfile, 'O', 'real_O');
-all_vars_matfile = fullfile(out_dir, 'all_vars.mat');
+all_vars_matfile = fullfile(out_dir, ['all_vars_',Np_Iter,'_',opts.mode,'.mat']);
 save(all_vars_matfile);
 
 
@@ -365,7 +368,7 @@ proc_abs_O = abs(O);
 proc_abs_O(abs(O)>25) = 25;
 f5 = figure('visible','off');imshow(proc_abs_O,[]);
 title(['(', opts.mode, ')',' processed abs (O)']);
-export_fig(f5,strcat(out_dir,'proc_abs_O_',opts.mode,'.png'),'-m4');
+export_fig(f5,strcat(out_dir,'proc_abs_O_',Np_Iter,'_',opts.mode,'.png'),'-m4');
 
 
 fprintf('processing completes\n');
