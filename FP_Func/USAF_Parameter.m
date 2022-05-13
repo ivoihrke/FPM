@@ -42,24 +42,32 @@ dpix_m = dpix_c/mag;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Np = 100;
 
-% FoV in the object space
-FoV = Np*dpix_m;
+% FoV in the object space in x-direction
+FoV_idx = Np(1)*dpix_m;
+% FoV in the object space in y-direction
+FoV_idy = Np(2)*dpix_m;
 % sampling size at Fourier plane set by the image size (FoV)
 % sampling size at Fourier plane is always = 1/FoV
 if mod(Np,2) == 1
-    du = 1/dpix_m/(Np-1);
+    du = 1/dpix_m/(Np(1)-1);
+    dv = 1/dpix_m/(Np(2)-1);
 else
-    du = 1/FoV;
+    du = 1/FoV_idx;
+    dv = 1/FoV_idx;
 end
 
 % low-pass filter diameter set by the NA = bandwidth of a single measurment
 % in index
 % N_NA = round(2*um_m/du_m);
 % generate cutoff window by NA
-m = 1:Np;
-[mm,nn] = meshgrid(m-round((Np+1)/2));
+m_x = 1:Np(1);
+m_y = 1:Np(2);
+[mm,nn] = meshgrid(m_x-round((Np(1)+1)/2), m_y-round((Np(2)+1)/2));
+mm = mm';
+nn = nn';
 ridx = sqrt(mm.^2+nn.^2);
 um_idx = um_m/du;
+%um_idy = um_m/dv
 % assume a circular pupil function, lpf due to finite NA
 w_NA = double(ridx<um_idx);
 % h = fspecial('gaussian',10,5);
@@ -68,8 +76,8 @@ w_NA = double(ridx<um_idx);
 % support of OTF is 2x of ATF(NA)
 Ps_otf = double(ridx<2*um_idx);
 
-phC = ones(Np);
-aberration = ones(Np);
+phC = ones(Np(1), Np(2));
+aberration = ones(Np(1), Np(2));
 pupil = w_NA.*phC.*aberration;
 
 clear m mm nn
@@ -85,10 +93,10 @@ ncent = [1080,1280];
 % start pixel of the image patch
 nstart = [981,1181];
 % center, start & end of the image patch
-img_ncent = nstart-ncent+Np/2;
-img_center = (nstart-ncent+Np/2)*dpix_m;
-img_start = nstart*dpix_m;
-img_end = (nstart+Np)*dpix_m;
+img_ncent = [nstart(1)-ncent(1)+Np(1)/2,  nstart(2)-ncent(2)+Np(2)/2];
+img_center = [(nstart(1)-ncent(1)+Np(1)/2)*dpix_m, (nstart(2)-ncent(2)+Np(2)/2)*dpix_m];
+%img_start = nstart*dpix_m; %unused variable
+%img_end = (nstart+Np)*dpix_m; %unused variable
 
 
 %% LED array geometries 
@@ -130,6 +138,7 @@ dd = sqrt((-hhled*ds_led-img_center(1)).^2+(-vvled*ds_led-img_center(2)).^2+z_le
 sin_thetav = (-hhled*ds_led-img_center(1))./dd;
 sin_thetah = (-vvled*ds_led-img_center(2))./dd;
 
+
 illumination_na = sqrt(sin_thetav.^2+sin_thetah.^2);
 % corresponding spatial freq for each LEDs
 
@@ -139,7 +148,9 @@ vled = sin_thetav/lambda;
 uled = sin_thetah/lambda;
 % spatial freq index for each plane wave relative to the center
 idx_u = round(uled/du);
-idx_v = round(vled/du);
+%idx_v = round(vled/du);
+idx_v = round(vled/dv);
+
 
 illumination_na_used = illumination_na(LitCoord);
 
@@ -162,7 +173,7 @@ N_obj = round(2*um_p/du)*2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % need to enforce N_obj/Np = integer to ensure no FT artifacts
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-N_obj = ceil(N_obj/Np)*Np;
+N_obj = ceil(N_obj/Np(1))*Np(1);
 % max spatial freq of the original object
 um_obj = du*N_obj/2;
 
@@ -171,7 +182,7 @@ dx_obj = 1/um_obj/2;
 
 
 % end
-[xp,yp] = meshgrid([-Np/2:Np/2-1]*dpix_m);
+[xp,yp] = meshgrid([-Np(1)/2:Np(1)/2-1]*dpix_m);
 
 x0 = [-N_obj/2:N_obj/2/2-1]*dx_obj;
 [xx0,yy0] = meshgrid(x0);

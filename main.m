@@ -122,10 +122,11 @@ title('img of Iall, index==128');
 export_fig(f_test,strcat(out_dir,'Iall_index_128.png'),'-m4');
 
 %% define processing ROI
-Np = 344;
+%Np = 344;
 %Np = 1000;
 %Np = 2048;
 %Np = 2160;
+Np = [2160, 2560]
 
 %nstart = [1,1];
 
@@ -137,10 +138,10 @@ else
 end
 
 % overwrite nstart in USAF_Parameter.m
-%nstart = [1,1];
+nstart = [1,1];
 
 %% load in data: read in the patch from the memory
-Imea = double(Iall(nstart(1):nstart(1)+Np-1,nstart(2):nstart(2)+Np-1,:)); % why arrray 344x344x293??
+Imea = double(Iall(nstart(1):nstart(1)+Np(1)-1,nstart(2):nstart(2)+Np(2)-1,:)); % why arrray 344x344x293??
 %Imea = double(Iall(1:n1-1,1:n2-1,:)); % why arrray 344x344x293??
 
 f_test = figure('visible','off');imshow(uint16(Imea(:,:,128)));
@@ -287,9 +288,11 @@ export_fig(f_test,strcat(out_dir,'I_input_to_AlterMin_index_128.png'),'-m4');
     % caution: takes consierably much longer time to compute a single iteration
 %   F, Ft: operators of Fourier transform and inverse
 opts.tol = 1;
-opts.maxIter = 10; 
+opts.maxIter = 1; 
+%opts.maxIter = 10; 
 %opts.maxIter = 20;
-opts.minIter = 2;
+opts.minIter = 1;
+%opts.minIter = 2;
 %opts.minIter = 20;
 %opts.minIter = 10;
 opts.monotone = 1;
@@ -299,7 +302,7 @@ opts.monotone = 1;
 opts.display = 'full';%0;%'iter';
 opts.out_dir = out_dir;
 
-upsamp = @(x) padarray(x,[(N_obj-Np)/2,(N_obj-Np)/2]);
+upsamp = @(x) padarray(x,[(N_obj-Np(1))/2,(N_obj-Np(1))/2]);
 opts.O0 = F(sqrt(I(:,:,1)));
 opts.O0 = upsamp(opts.O0);
 opts.P0 = w_NA;
