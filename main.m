@@ -348,11 +348,19 @@ f3 = figure('visible','off');imshow(abs_O,[]);
 title(['(', opts.mode, ')',' abs (O)']);
 export_fig(f3,strcat(out_dir,'abs_O_',Np_Iter,'_',opts.mode,'.png'),'-m4');
 
-f4 = figure('visible','off'); h=barh(err_pc);
+f4 = figure('visible','off'); 
+plot(1:length(err_pc), (err_pc))
 title(['(', opts.mode, ')', ' err/iter']);
 xlabel('err');
 ylabel('iter');
 export_fig(f4,strcat(out_dir,'err_',Np_Iter,'_',opts.mode,'.png'),'-m4');
+
+f_err_log = figure('visible','off');
+plot(1:length(err_pc), (log(err_pc)))
+title(['(', opts.mode, ')', ' err/iter']);
+xlabel('log err');
+ylabel('iter');
+export_fig(f_err_log,strcat(out_dir,'err_log_',Np_Iter,'_',opts.mode,'.png'),'-m4');
 
 % figure(3);imagesc(-angle(O));colormap gray;
 
