@@ -180,9 +180,8 @@ um_obj = du*N_obj/2;
 % sampling size of the object (=pixel size of the test image)
 dx_obj = 1/um_obj/2;
 
-
 % end
-[xp,yp] = meshgrid([-Np(1)/2:Np(1)/2-1]*dpix_m);
+[xp,yp] = meshgrid([-Np(1)/2:Np(1)/2-1]*dpix_m, [-Np(2)/2:Np(2)/2-1]*dpix_m);
 
 x0 = [-N_obj/2:N_obj/2/2-1]*dx_obj;
 [xx0,yy0] = meshgrid(x0);

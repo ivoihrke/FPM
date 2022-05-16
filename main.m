@@ -372,6 +372,9 @@ hig_res_O_matfile = fullfile(out_dir, ['hig_res_O_',Np_Iter,'_',opts.mode,'.mat'
 save(hig_res_O_matfile, 'O', 'real_O');
 all_vars_matfile = fullfile(out_dir, ['all_vars_',Np_Iter,'_',opts.mode,'.mat']);
 save(all_vars_matfile);
+% save all but these large variables
+%save(all_vars_matfile, '-regexp','^(?!(I|Iall|Imea_reorder|Ithresh_reorder)$).');
+
 
 
 %post-processing of the white pixels w/ high intensity
