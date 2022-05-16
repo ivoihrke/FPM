@@ -186,7 +186,9 @@ iter = 0;
 scale = opts.scale; %initialize LED brightness map
 scale = reshape(scale,r0,Nimg);
 
-if opts.display
+
+% to save 0 iter results, i.e. before any update to O and P
+if strcmp(opts.display,'full')
     if strcmp(opts.mode,'real')
         o = O;
     elseif strcmp(opts.mode,'fourier')
@@ -269,6 +271,18 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         %the actual application of the projection 2 
         [O,P] = P2(O,P,dPsi./repmat(H0,[1,1,r0]),Omax,cen);
         
+        % plotting intermediate 'UPDATED' O and P for each image
+        %f_intermediate_P = figure('visible','off');
+        %imagesc(abs(P));axis image; colormap gray; colorbar;
+        %title(['(', opts.mode, ')',' abs (P)', 'for image ', m]);
+        %export_fig(f_intermediate_P,strcat(opts.out_dir,'abs_P_','m_', num2str(m),'_',opts.mode, '.png'),'-m4');
+
+        %f_intermediate_O = figure('visible','off');
+        %imagesc(abs(o));axis image; colormap gray; colorbar;
+        %title(['(', opts.mode, ')',' abs (O)', 'for image ', m]);
+        %export_fig(f_intermediate_O,strcat(opts.out_dir,'abs_O_','m_', num2str(m),'_',opts.mode, '.png'),'-m4');
+
+        
         % ----------------- additional functionality of estimating updates to idealized LED positions --------------
         %    - Yeh et al. 2015
         %    - sa = simulated annealing
@@ -318,22 +332,22 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
     % record the error and can check the convergence later.
     err = [err,err2];
     
-    if strcmp(opts.display,'iter')
-        if strcmp(opts.mode,'real')
-            o = O;
-        elseif strcmp(opts.mode,'fourier')
-            o = Ft(O);
-        end
-        subplot(221); imagesc(abs(o)); axis image; colormap gray; colorbar;
-        title('ampl(o)');
-        subplot(222); imagesc(angle(o)); axis image; colormap gray; colorbar;
-        title('phase(o)');
-        subplot(223); imagesc(abs(P)); axis image; colormap gray; colorbar;
-        title('ampl(P)');
-        subplot(224); imagesc(angle(P).*abs(P)); axis image; colorbar;
-        title('phase(P)');
-        drawnow;
-    end
+    %if strcmp(opts.display,'iter')
+    %    if strcmp(opts.mode,'real')
+    %        o = O;
+    %    elseif strcmp(opts.mode,'fourier')
+    %        o = Ft(O);
+    %    end
+    %    subplot(221); imagesc(abs(o)); axis image; colormap gray; colorbar;
+    %    title('ampl(o)');
+    %    subplot(222); imagesc(angle(o)); axis image; colormap gray; colorbar;
+    %    title('phase(o)');
+    %    subplot(223); imagesc(abs(P)); axis image; colormap gray; colorbar;
+    %    title('ampl(P)');
+    %    subplot(224); imagesc(angle(P).*abs(P)); axis image; colorbar;
+    %    title('phase(P)');
+    %    drawnow;
+    %end
     
     fprintf('| %2d   | %.2e |\n',iter,err2);
     if opts.saveIterResult
