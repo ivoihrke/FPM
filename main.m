@@ -302,7 +302,7 @@ opts.monotone = 1;
 opts.display = 'full';%0;%'iter';
 opts.out_dir = out_dir;
 
-upsamp = @(x) padarray(x,[(N_obj-Np(1))/2,(N_obj-Np(1))/2]);
+upsamp = @(x) padarray(x,[(N_obj(1)-Np(1))/2,(N_obj(2)-Np(2))/2]);
 opts.O0 = F(sqrt(I(:,:,1)));
 opts.O0 = upsamp(opts.O0);
 opts.P0 = w_NA;
@@ -324,7 +324,7 @@ disp(['nstart: ', num2str(nstart)]);
 disp(['Np: ', num2str(Np)]);
 f88 = [];
 %% algorithm starts
-[O,P,err_pc,c,Ns_cal] = AlterMin(I,[N_obj,N_obj],round(Ns2),opts);
+[O,P,err_pc,c,Ns_cal] = AlterMin(I,[N_obj(1),N_obj(2)],round(Ns2),opts);
 
 %% save results
 %fn = ['RandLit-',num2str(numlit),'-',num2str(Nused)];
@@ -379,7 +379,8 @@ save(all_vars_matfile);
 
 %post-processing of the white pixels w/ high intensity
 proc_abs_O = abs(O);
-proc_abs_O(abs(O)>25) = 25;
+%proc_abs_O(abs(O)>25) = 25;
+proc_abs_O(abs(O)>18) = 18;
 f5 = figure('visible','off');imshow(proc_abs_O,[]);
 title(['(', opts.mode, ')',' processed abs (O)']);
 export_fig(f5,strcat(out_dir,'proc_abs_O_',Np_Iter,'_',opts.mode,'.png'),'-m4');

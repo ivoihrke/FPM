@@ -74,7 +74,7 @@ w_NA = double(ridx<um_idx);
 % w_NA = imfilter(w_NA,h);
 
 % support of OTF is 2x of ATF(NA)
-Ps_otf = double(ridx<2*um_idx);
+%Ps_otf = double(ridx<2*um_idx);
 
 phC = ones(Np(1), Np(2));
 aberration = ones(Np(1), Np(2));
@@ -169,25 +169,25 @@ disp(['synthetic NA is ',num2str(um_p*lambda)]);
 % assume the max spatial freq of the original object
 % um_obj>um_p
 % assume the # of pixels of the original object
-N_obj = round(2*um_p/du)*2;
+N_obj = [round(2*um_p/du)*2, round(2*um_p/dv)*2] ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % need to enforce N_obj/Np = integer to ensure no FT artifacts
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-N_obj = ceil(N_obj/Np(1))*Np(1);
+N_obj = [ceil(N_obj(1)/Np(1))*Np(1), ceil(N_obj(2)/Np(2))*Np(2)];
 % max spatial freq of the original object
-um_obj = du*N_obj/2;
+um_obj = [du*N_obj(1)/2, dv*N_obj(2)/2];
 
 % sampling size of the object (=pixel size of the test image)
-dx_obj = 1/um_obj/2;
+dx_obj = [1/um_obj(1)/2, 1/um_obj(2)/2];
 
 % end
 [xp,yp] = meshgrid([-Np(1)/2:Np(1)/2-1]*dpix_m, [-Np(2)/2:Np(2)/2-1]*dpix_m);
 
-x0 = [-N_obj/2:N_obj/2/2-1]*dx_obj;
-[xx0,yy0] = meshgrid(x0);
+%x0 = ([-N_obj(1)/2:N_obj(1)/2/2-1]*dx_obj(1), [-N_obj(2)/2:N_obj(2)/2/2-1]*dx_obj(2));
+[xx0,yy0] = meshgrid([-N_obj(1)/2:N_obj(1)/2/2-1]*dx_obj(1), [-N_obj(2)/2:N_obj(2)/2/2-1]*dx_obj(2));
 
 %% define propagation transfer function
-[u,v] = meshgrid(-um_obj:du:um_obj-du);
+[u,v] = meshgrid(-um_obj(1):du:um_obj(1)-du,-um_obj(2):dv:um_obj(2)-dv);
 
 % Fresnel
 % object defocus distance
