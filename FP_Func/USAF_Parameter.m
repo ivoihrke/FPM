@@ -53,7 +53,7 @@ if mod(Np,2) == 1
     dv = 1/dpix_m/(Np(2)-1);
 else
     du = 1/FoV_idx;
-    dv = 1/FoV_idx;
+    dv = 1/FoV_idy;
 end
 
 % low-pass filter diameter set by the NA = bandwidth of a single measurment

@@ -40,7 +40,7 @@ addpath('FP_Func/');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % specify which sample to use as input
-sample_name= 'USAF'; %'staind', 'USAF', 'hela'
+sample_name= 'hela'; %'stained', 'USAF', 'hela'
 
 % map container of input directory path to
 % multiplex reading of images
@@ -126,16 +126,19 @@ toc;
 %Np = 1000;
 %Np = 2048;
 %Np = 2160;
+%Np = [344,344];
 Np = [2160, 2560]
+
 
 %nstart = [1,1];
 
 %% read system parameters
-if sample_name == 'USAF'
-    USAF_Parameter();
-else
-    test_setup();
-end
+USAF_Parameter();
+%if sample_name == 'USAF'
+%    USAF_Parameter();
+%else
+%    test_setup();
+%end
 
 % overwrite nstart in USAF_Parameter.m
 nstart = [1,1];
@@ -179,7 +182,7 @@ for m = 1:Nimg
                      %Therefore, for that image, which LED was on!!
                      
     % this is a translation from the LED plane represented by lit0 or lit
-    % to the image/object plane represented by idx_u and idx_v
+    % to the pupil plane represented by idx_u and idx_v
     Nsh_lit(:,m) = idx_u(lit0); % for the LED that was on, get dirac peak position in u-coordinate (of the horizontal) relative to the center of image
     Nsv_lit(:,m) = idx_v(lit0); % for the LED that was on, get dirac peak position in v-coordinate (of the vertical) relative to the center of image
 end
@@ -288,7 +291,8 @@ export_fig(f_test,strcat(out_dir,'I_input_to_AlterMin_index_128.png'),'-m4');
     % caution: takes consierably much longer time to compute a single iteration
 %   F, Ft: operators of Fourier transform and inverse
 opts.tol = 1;
-opts.maxIter = 1; 
+%opts.maxIter = 1;
+opts.maxIter = 3; 
 %opts.maxIter = 10; 
 %opts.maxIter = 20;
 opts.minIter = 1;
@@ -333,7 +337,7 @@ f88 = [];
 %f1 = figure; imagesc(-angle(O),[-.6,1]); axis image; colormap gray; axis off 
 
 % add tag for Np + maxIter
-Np_Iter = ['Np_',num2str(Np),'_minIter_',num2str(opts.minIter),'_maxIter_',num2str(opts.maxIter)];
+Np_Iter = ['Np_',num2str(Np(1)),'_',num2str(Np(2)),'_minIter_',num2str(opts.minIter),'_maxIter_',num2str(opts.maxIter)];
 
 %I = mat2gray(real(O));
 real_O = mat2gray(real(O));

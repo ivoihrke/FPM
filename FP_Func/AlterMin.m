@@ -178,7 +178,9 @@ fprintf('\n');
 
 %% initialization in FT domain
 P = opts.P0; opts.P0 = 0;
-O = opts.O0; opts.O0 = 0;
+O = opts.O0; 
+O_zero = opts.O0;
+opts.O0 = 0;
 err1 = inf;
 err2 = 50;
 err = [];
@@ -222,6 +224,7 @@ fprintf('| %2d   | %.2e |\n',iter,err1);
 %GUESS -- needs to be validated: maximum distance between Dirac peaks corresponding to LEDs in the FD 
 sp0 = max(row(abs(Ns(:,1,:)-Ns(:,2,:))));
 
+dirac_cen = zeros(293,2); %dirac positions corresponding to each image
 while abs(err1-err2)>opts.tol&&iter<opts.maxIter
 %     psistack = zeros(64,64,293);
     fprintf('iter: %d \n', iter);
@@ -236,6 +239,8 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         scale0 = zeros(r0,1); %relative intensity of the LED that is on
         for p = 1:r0
             cen(:,p) = cen0-row(Ns(p,m,:)); %the Dirac peak corresponding to illumination LED p (out of the multiplex set r0) for the acquired image m
+            dirac_cen(m,1) = cen(1,p);
+            dirac_cen(m,2) = cen(2,p);
             scale0(p) = scale(p,m); %corresponding relative intensity
             Psi0(:,:,p) = downsamp(O,cen(:,p)).*P.*H0; %crop a low-res estimate around LED Dirac position, multiply with combined pupil function (known and estimated components), Eq. 6 Tian'14
             Psi_scale(:,:,p) = sqrt(scale0(p))*Psi0(:,:,p); %adjust its relative brightness
@@ -249,6 +254,10 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
 %         psistack(:,:,m) = psi0;
         % estimated intensity w/o correction term 
         I_est = sum(abs(psi0).^2,3); %remember multiplex setting has r0 channels for r0 LEDs that are on, need to sum them, Eq. 2, Tian'14 -- this is complex 
+
+        %I_mea_I_est = fullfile(opts.out_dir, ['I_mea_I_est_','m_', num2str(m),opts.mode,'.mat']);
+        %save(I_mea_I_est, 'I_mea', 'I_est');
+
         Psi = Proj_Fourier_v2(psi0, I_mea, I_est, scale0, F); %this is the amplitude correction step in the FD, Fig. 3 "impose intensity constraint" box, Tian'14 -- output low-res updated FT of image m
         
         
@@ -352,6 +361,8 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
     fprintf('| %2d   | %.2e |\n',iter,err2);
     if opts.saveIterResult
         export_fig(f6,strcat(opts.out_dir,'R_',num2str(iter),'_',opts.mode,'.png'),'-m4');
+        all_vars_matfile = fullfile(opts.out_dir, ['dirac_cen_','R_',num2str(iter),'_',opts.mode,'.mat']);
+        save(all_vars_matfile, 'dirac_cen', 'cen0', 'Ns', 'O_zero');
         %saveas(f2,[opts.out_dir,'Ph_',num2str(iter),'.png']);
     end
     
