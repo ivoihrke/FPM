@@ -209,7 +209,7 @@ if strcmp(opts.display,'full')
 end
 
 if opts.saveIterResult %set this to activate intermediate output saving - need to use in conjunction with opts.display
-    export_fig(f5,strcat(opts.out_dir,'R_',num2str(iter),'_',opts.mode,'.png'),'-m4');
+    export_fig(f5,strcat(opts.out_dir,'R_',num2str(iter),'.png'),'-m4');
 end
 
 
@@ -255,8 +255,6 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         % estimated intensity w/o correction term 
         I_est = sum(abs(psi0).^2,3); %remember multiplex setting has r0 channels for r0 LEDs that are on, need to sum them, Eq. 2, Tian'14 -- this is complex 
 
-        %I_mea_I_est = fullfile(opts.out_dir, ['I_mea_I_est_','m_', num2str(m),opts.mode,'.mat']);
-        %save(I_mea_I_est, 'I_mea', 'I_est');
 
         Psi = Proj_Fourier_v2(psi0, I_mea, I_est, scale0, F); %this is the amplitude correction step in the FD, Fig. 3 "impose intensity constraint" box, Tian'14 -- output low-res updated FT of image m
         
@@ -279,17 +277,6 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         end
         %the actual application of the projection 2 
         [O,P] = P2(O,P,dPsi./repmat(H0,[1,1,r0]),Omax,cen);
-        
-        % plotting intermediate 'UPDATED' O and P for each image
-        %f_intermediate_P = figure('visible','off');
-        %imagesc(abs(P));axis image; colormap gray; colorbar;
-        %title(['(', opts.mode, ')',' abs (P)', 'for image ', m]);
-        %export_fig(f_intermediate_P,strcat(opts.out_dir,'abs_P_','m_', num2str(m),'_',opts.mode, '.png'),'-m4');
-
-        %f_intermediate_O = figure('visible','off');
-        %imagesc(abs(o));axis image; colormap gray; colorbar;
-        %title(['(', opts.mode, ')',' abs (O)', 'for image ', m]);
-        %export_fig(f_intermediate_O,strcat(opts.out_dir,'abs_O_','m_', num2str(m),'_',opts.mode, '.png'),'-m4');
 
         
         % ----------------- additional functionality of estimating updates to idealized LED positions --------------
@@ -341,29 +328,11 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
     % record the error and can check the convergence later.
     err = [err,err2];
     
-    %if strcmp(opts.display,'iter')
-    %    if strcmp(opts.mode,'real')
-    %        o = O;
-    %    elseif strcmp(opts.mode,'fourier')
-    %        o = Ft(O);
-    %    end
-    %    subplot(221); imagesc(abs(o)); axis image; colormap gray; colorbar;
-    %    title('ampl(o)');
-    %    subplot(222); imagesc(angle(o)); axis image; colormap gray; colorbar;
-    %    title('phase(o)');
-    %    subplot(223); imagesc(abs(P)); axis image; colormap gray; colorbar;
-    %    title('ampl(P)');
-    %    subplot(224); imagesc(angle(P).*abs(P)); axis image; colorbar;
-    %    title('phase(P)');
-    %    drawnow;
-    %end
-    
     fprintf('| %2d   | %.2e |\n',iter,err2);
     if opts.saveIterResult
-        export_fig(f6,strcat(opts.out_dir,'R_',num2str(iter),'_',opts.mode,'.png'),'-m4');
-        all_vars_matfile = fullfile(opts.out_dir, ['dirac_cen_','R_',num2str(iter),'_',opts.mode,'.mat']);
+        export_fig(f6,strcat(opts.out_dir,'R_',num2str(iter),'.png'),'-m4');
+        all_vars_matfile = fullfile(opts.out_dir, ['dirac_cen_','R_',num2str(iter),'.mat']);
         save(all_vars_matfile, 'dirac_cen', 'cen0', 'Ns', 'O_zero');
-        %saveas(f2,[opts.out_dir,'Ph_',num2str(iter),'.png']);
     end
     
     if opts.monotone&&iter>opts.minIter

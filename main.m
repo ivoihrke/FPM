@@ -30,6 +30,7 @@ todaysdate = string(datetime('today','Format','dd_MM_yyyy'));
 addpath('../dependencies/natsortfiles');
 addpath('../dependencies/export_fig');
 addpath('../dependencies/labelpoints');
+addpath('../dependencies/min_max_elements_index_n_values');
 
 
 % add path for functions files
@@ -40,7 +41,7 @@ addpath('FP_Func/');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % specify which sample to use as input
-sample_name= 'hela'; %'stained', 'USAF', 'hela'
+sample_name= 'USAF'; %'stained', 'USAF', 'hela'
 
 % map container of input directory path to
 % multiplex reading of images
@@ -116,40 +117,18 @@ end
 fprintf(['\nfinish loading images\n']);
 toc;
 
-
-%f_test = figure('visible','off');imshow(Iall(:,:,128));
-%title('img of Iall, index==128');
-%export_fig(f_test,strcat(out_dir,'Iall_index_128.png'),'-m4');
-
 %% define processing ROI
-%Np = 344;
-%Np = 1000;
-%Np = 2048;
-%Np = 2160;
-%Np = [344,344];
-Np = [2160, 2560]
-
-
-%nstart = [1,1];
+Np = [2160, 2560];
 
 %% read system parameters
-USAF_Parameter();
-%if sample_name == 'USAF'
-%    USAF_Parameter();
-%else
-%    test_setup();
-%end
-
-% overwrite nstart in USAF_Parameter.m
-nstart = [1,1];
+if strcmp(sample_name,'USAF') | strcmp(sample_name,'stained')
+    USAF_Parameter();
+else
+    hela_Parameter();
+end
 
 %% load in data: read in the patch from the memory
-Imea = double(Iall(nstart(1):nstart(1)+Np(1)-1,nstart(2):nstart(2)+Np(2)-1,:)); % why arrray 344x344x293??
-%Imea = double(Iall(1:n1-1,1:n2-1,:)); % why arrray 344x344x293??
-
-%f_test = figure('visible','off');imshow(uint16(Imea(:,:,128)));
-%title('img of Imea, index==128; patched into 2048x2048');
-%export_fig(f_test,strcat(out_dir,'Imea_index_128.png'),'-m4');
+Imea = double(Iall(nstart(1):nstart(1)+Np(1)-1,nstart(2):nstart(2)+Np(2)-1,:));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TODO 5: Define the LED index
@@ -193,32 +172,8 @@ Ns = []; % 3D array where for each LED, the corresponding index of k_u and index
 Ns(:,:,1) = Nsv_lit;
 Ns(:,:,2) = Nsh_lit;
 
-% Images indexed by LEDs indicies at illumination plane
-%f_image_illum_plane = figure('visible','off'); 
-%pcolor(LitCoord);
-%labelpoints(LitCoord, string(illumination_na_used), 'FontSize', 5);
-%title(['Images pattern indexed by LEDs indicies at illumination plane for all 32x32 LEDs/n with their NAs']);
-%export_fig(f_image_illum_plane,strcat(out_dir,'image_indexed_pattern_illum_plane.png'),'-m4');
-
-
-%Dirac centers of the 32x32 LEDs
-f_dirac_32 = figure('visible','off'); scatter(idx_u, idx_v);
-title(['Dirac peaks centers at O plane for all 32x32 LEDs']);
-export_fig(f_dirac_32,strcat(out_dir,'dirac_centers_32_32.png'),'-m4');
-
-%Dirac centers of 293 LEDs sorted according to their NA
-f_dirac_293= figure('visible','off'); 
-scatter(Nsh_lit, Nsv_lit);
-labelpoints(Nsh_lit, Nsv_lit, string(idx_led), 'FontSize', 5);
-title(['Dirac peaks centers at O plane for all 293 LEDs after NA sorting']);
-export_fig(f_dirac_293,strcat(out_dir,'dirac_centers_293_NA_sorted.png'),'-m4');
-
 Imea_reorder = Imea(:,:,idx_led);
 Ibk_reorder = Ibk(idx_led);
-
-%f_test = figure('visible','off');imshow(uint16(Imea_reorder(:,:,5)));
-%title('img of Imea_reordered, old_index==128, reordered_index==5; patched into 344x344');
-%export_fig(f_test,strcat(out_dir,'Imea_reodered_index_128.png'),'-m4');
 
 % gain = a(idx_led);
 %%
@@ -235,10 +190,6 @@ for m = 1:Nimg
     Ithresh_reorder(:,:,m) = Itmp;
     
 end
-
-%f_test = figure('visible','off');imshow(uint16(Ithresh_reorder(:,:,5)));
-%title('img of Ithresh_reorder, old_index==128, reordered_index==5; patched into 344x344');
-%export_fig(f_test,strcat(out_dir,'Ithresh_reorder_index_128.png'),'-m4');
 
 %load('C:\Users\Muneeb\Desktop\ajmal fpm\laura\multiplexed fpm\Ns_cal289.mat\');
 % Ns_reorder = Ns(:,idx_led,:);
@@ -291,14 +242,8 @@ export_fig(f_test,strcat(out_dir,'I_input_to_AlterMin_index_128.png'),'-m4');
     % caution: takes consierably much longer time to compute a single iteration
 %   F, Ft: operators of Fourier transform and inverse
 opts.tol = 1;
-%opts.maxIter = 1;
 opts.maxIter = 3; 
-%opts.maxIter = 10; 
-%opts.maxIter = 20;
 opts.minIter = 1;
-%opts.minIter = 2;
-%opts.minIter = 20;
-%opts.minIter = 10;
 opts.monotone = 1;
 % 'full', display every subroutin,
 % 'iter', display only results from outer loop
@@ -313,7 +258,6 @@ opts.P0 = w_NA;
 opts.Ps = w_NA;
 opts.iters = 1;
 opts.mode = 'fourier';
-%opts.mode = 'real';
 opts.scale = ones(Nused,1);
 opts.OP_alpha = 1;
 opts.OP_beta = 1e3 ;
@@ -331,63 +275,61 @@ f88 = [];
 [O,P,err_pc,c,Ns_cal] = AlterMin(I,[N_obj(1),N_obj(2)],round(Ns2),opts);
 
 %% save results
-%fn = ['RandLit-',num2str(numlit),'-',num2str(Nused)];
-%save([out_dir,'\',fn],'O','P','err_pc','c','Ns_cal');
-
-%f1 = figure; imagesc(-angle(O),[-.6,1]); axis image; colormap gray; axis off 
 
 % add tag for Np + maxIter
 Np_Iter = ['Np_',num2str(Np(1)),'_',num2str(Np(2)),'_minIter_',num2str(opts.minIter),'_maxIter_',num2str(opts.maxIter)];
 
-%I = mat2gray(real(O));
-real_O = mat2gray(real(O));
+real_O = real(O);
+imwrite(real_O, strcat(out_dir,'O_',Np_Iter,'_image.png'));
 f1 = figure('visible','off');imshow(real_O);
-title(['(', opts.mode, ')',' (O)']);
-export_fig(f1,strcat(out_dir,'O_',Np_Iter,'_',opts.mode,'.png'),'-m4');
+title('(O)');
+export_fig(f1,strcat(out_dir,'O_',Np_Iter,'_figure.png'),'-m4');
 
 angle_O = angle(O);
+imwrite(angle_O, strcat(out_dir,'angle_O_',Np_Iter,'_image.png'));
 f2 = figure('visible','off');imshow(angle_O,[]);
-title(['(', opts.mode, ')',' angle (O)']);
-export_fig(f2,strcat(out_dir,'angle_O_',Np_Iter,'_',opts.mode,'.png'),'-m4');
+title('angle (O)');
+export_fig(f2,strcat(out_dir,'angle_O_',Np_Iter,'_figure.png'),'-m4');
 
 abs_O = abs(O);
+imwrite(abs_O, strcat(out_dir,'abs_O_',Np_Iter,'_image.png'));
 f3 = figure('visible','off');imshow(abs_O,[]);
-title(['(', opts.mode, ')',' abs (O)']);
-export_fig(f3,strcat(out_dir,'abs_O_',Np_Iter,'_',opts.mode,'.png'),'-m4');
+title('abs (O)');
+export_fig(f3,strcat(out_dir,'abs_O_',Np_Iter,'_figure.png'),'-m4');
 
 f4 = figure('visible','off'); 
 plot(1:length(err_pc), (err_pc))
-title(['(', opts.mode, ')', ' err/iter']);
+title('err/iter');
 xlabel('err');
 ylabel('iter');
-export_fig(f4,strcat(out_dir,'err_',Np_Iter,'_',opts.mode,'.png'),'-m4');
+export_fig(f4,strcat(out_dir,'err_',Np_Iter,'.png'),'-m4');
 
 f_err_log = figure('visible','off');
 plot(1:length(err_pc), (log(err_pc)))
-title(['(', opts.mode, ')', ' err/iter']);
+title('err/iter');
 xlabel('log err');
 ylabel('iter');
-export_fig(f_err_log,strcat(out_dir,'err_log_',Np_Iter,'_',opts.mode,'.png'),'-m4');
+export_fig(f_err_log,strcat(out_dir,'err_log_',Np_Iter,'.png'),'-m4');
 
-% figure(3);imagesc(-angle(O));colormap gray;
 
 % saving variables to matlab files
-hig_res_O_matfile = fullfile(out_dir, ['hig_res_O_',Np_Iter,'_',opts.mode,'.mat']);
-save(hig_res_O_matfile, 'O', 'real_O');
-all_vars_matfile = fullfile(out_dir, ['all_vars_',Np_Iter,'_',opts.mode,'.mat']);
-save(all_vars_matfile);
-% save all but these large variables
+hig_res_O_matfile = fullfile(out_dir, ['hig_res_O_',Np_Iter,'.mat']);
+save(hig_res_O_matfile, 'O', 'real_O', '-v7.3');
+all_vars_matfile = fullfile(out_dir, ['all_vars_',Np_Iter,'.mat']);
+%save(all_vars_matfile);
+save(all_vars_matfile, '-v7.3');
+% To save all but some large variables,e.g. I, Iall,etc (uncomment next line)
 %save(all_vars_matfile, '-regexp','^(?!(I|Iall|Imea_reorder|Ithresh_reorder)$).');
-
 
 
 %post-processing of the white pixels w/ high intensity
 proc_abs_O = abs(O);
-%proc_abs_O(abs(O)>25) = 25;
-proc_abs_O(abs(O)>18) = 18;
+proc_abs_O(abs(O)>25) = 25;
+%proc_abs_O(abs(O)>18) = 18;
+imwrite(proc_abs_O, strcat(out_dir,'proc_abs_O_',Np_Iter,'_image.png'));
 f5 = figure('visible','off');imshow(proc_abs_O,[]);
-title(['(', opts.mode, ')',' processed abs (O)']);
-export_fig(f5,strcat(out_dir,'proc_abs_O_',Np_Iter,'_',opts.mode,'.png'),'-m4');
+title(['processed abs (O)']);
+export_fig(f5,strcat(out_dir,'proc_abs_O_',Np_Iter,'_figure.png'),'-m4');
 
 
 fprintf('processing completes\n');

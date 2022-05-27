@@ -19,9 +19,7 @@ function [ O,P ] = GDUpdate_Multiplication_rank1(O,P,dpsi,Omax,cen,Ps,alpha,beta
 Np = size(P); Np = Np(:); % convert a row into a column
 
 % operator to put P at proper location at the O plane
-%n1 = cen-floor(Np/2);
 n1 = [cen(1)-floor(Np(1)/2), cen(2)-floor(Np(2)/2)];
-%n2 = n1+Np-1;
 n2 = [n1(1)+Np(1)-1, n1(2)+Np(2)-1];
 % operator to crop region of O from proper location at the O plane
 downsamp = @(x) x(n1(1):n2(1),n1(2):n2(2));
