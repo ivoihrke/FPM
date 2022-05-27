@@ -3,8 +3,6 @@
 % ref
 % Lei Tian, et.al, Biomedical Optics Express 5, 2376-2389 (2014).
 %
-% last modified on 10/07/2015
-% by Lei Tian, lei_tian@alum.mit.edu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % All main.m, AtlerMin.m, GDUpdate_Multiplication_rank1.m, USAF_Parameter.m, 
 % hela_Parameter.m files are modified and extended to:
@@ -18,10 +16,12 @@
 % very large (intensity) values in the input stacks (and not due to
 % the Algorithm itself!).
 %
-% modified on 27.05.2022
+% last modified on 27.05.2022
 % by John Meshreki, john.meshreki@gmail.com
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% last modified on 10/07/2015
+% by Lei Tian, lei_tian@alum.mit.edu
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % To do list for the user: (marked by 'TODO#')
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1) specify where the data located in 'filedir'

@@ -1,5 +1,3 @@
-% Last modofied on 4/22/2014 
-% Lei Tian (lei_tian@alum.mit.edu)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % All main.m, AtlerMin.m, GDUpdate_Multiplication_rank1.m, USAF_Parameter.m, 
 % hela_Parameter.m files are modified and extended to:
@@ -13,9 +11,11 @@
 % very large (intensity) values in the input stacks (and not due to
 % the Algorithm itself!).
 %
-% modified on 27.05.2022
+% last modified on 27.05.2022
 % by John Meshreki, john.meshreki@gmail.com
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Last modofied on 4/22/2014 
+% Lei Tian (lei_tian@alum.mit.edu)
 
 fprintf('In hela_Parameter.m')
 

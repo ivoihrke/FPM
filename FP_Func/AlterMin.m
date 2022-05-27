@@ -50,8 +50,6 @@ fprintf('in the AlteMin fnc\n');
 % Yeh'15:  Yeh et al.  "Experimental robustness of Fourier ptychography phase retrieval algorithms", Optics Express, Vol 23(26), pp. 33214-33240
 %
 %
-% Last modified on 10/07/2017
-% by Lei Tian, lei_tian@alum.mit.edu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % All main.m, AtlerMin.m, GDUpdate_Multiplication_rank1.m, USAF_Parameter.m, 
 % hela_Parameter.m files are modified and extended to:
@@ -65,9 +63,12 @@ fprintf('in the AlteMin fnc\n');
 % very large (intensity) values in the input stacks (and not due to
 % the Algorithm itself!).
 %
-% modified on 27.05.2022
+% last modified on 27.05.2022
 % by John Meshreki, john.meshreki@gmail.com
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Last modified on 10/07/2017
+% by Lei Tian, lei_tian@alum.mit.edu
+
 
 %% derived constants
 % size of measurement
