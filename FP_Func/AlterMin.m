@@ -196,7 +196,7 @@ fprintf('\n');
 %% initialization in FT domain
 P = opts.P0; opts.P0 = 0;
 O = opts.O0; 
-O_zero = opts.O0;
+%O_zero = opts.O0;
 opts.O0 = 0;
 err1 = inf;
 err2 = 50;
@@ -348,8 +348,6 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
     fprintf('| %2d   | %.2e |\n',iter,err2);
     if opts.saveIterResult
         export_fig(f6,strcat(opts.out_dir,'R_',num2str(iter),'.png'),'-m4');
-        all_vars_matfile = fullfile(opts.out_dir, ['dirac_cen_','R_',num2str(iter),'.mat']);
-        save(all_vars_matfile, 'dirac_cen', 'cen0', 'Ns', 'O_zero');
     end
     
     if opts.monotone&&iter>opts.minIter
@@ -360,6 +358,16 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
     
     
 end
+
+%saving dirac peak positions as matfile & figure
+all_vars_matfile = fullfile(opts.out_dir, ['dirac_cen','.mat']);
+save(all_vars_matfile, 'dirac_cen', 'cen0', 'Ns');
+f_edirac_peaks = figure('visible','off');
+scatter(dirac_cen(:,1), dirac_cen(:,2))
+labelpoints(dirac_cen(:,1), dirac_cen(:,2), string(opts.idx_led(:)), 'FontSize', 6);
+export_fig(f_edirac_peaks,strcat(opts.out_dir,'dirac_cen','.png'),'-m4');
+
+
 if strcmp(opts.mode,'fourier')
     O = Ft(O);
 end

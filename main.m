@@ -133,7 +133,9 @@ fprintf(['\nfinish loading images\n']);
 toc;
 
 %% define processing ROI
-Np = [2160, 2560];
+%Np = [2160, 2560];
+Np = [344, 344];
+
 
 %% read system parameters
 if strcmp(sample_name,'USAF') | strcmp(sample_name,'stained')
@@ -282,6 +284,8 @@ opts.F = F;
 opts.Ft = Ft;
 opts.StepSize = 0.1;
 opts.saveIterResult = 1;
+opts.idx_led = idx_led(:);
+
 disp(opts);
 disp(['nstart: ', num2str(nstart)]);
 disp(['Np: ', num2str(Np)]);
@@ -315,15 +319,15 @@ export_fig(f3,strcat(out_dir,'abs_O_',Np_Iter,'_figure.png'),'-m4');
 f4 = figure('visible','off'); 
 plot(1:length(err_pc), (err_pc))
 title('err/iter');
-xlabel('err');
-ylabel('iter');
+xlabel('iter');
+ylabel('err');
 export_fig(f4,strcat(out_dir,'err_',Np_Iter,'.png'),'-m4');
 
 f_err_log = figure('visible','off');
 plot(1:length(err_pc), (log(err_pc)))
 title('err/iter');
-xlabel('log err');
-ylabel('iter');
+xlabel('iter');
+ylabel('log err');
 export_fig(f_err_log,strcat(out_dir,'err_log_',Np_Iter,'.png'),'-m4');
 
 
