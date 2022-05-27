@@ -52,6 +52,22 @@ fprintf('in the AlteMin fnc\n');
 %
 % Last modified on 10/07/2017
 % by Lei Tian, lei_tian@alum.mit.edu
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% All main.m, AtlerMin.m, GDUpdate_Multiplication_rank1.m, USAF_Parameter.m, 
+% hela_Parameter.m files are modified and extended to:
+%
+% 1- allowing a FULL reconstruction of the input images for 
+% any dimesnions (i.e. not only square crops of them!).
+% 2- saving images (and figures) for multiple variables.
+% 3- saving dirac peaks positions.
+% 4- adding more descriptive comments (in addition to those added by Ivo Ihrke).
+% 4- investigating the huge error of the Algorithm to be due to pixels w/ 
+% very large (intensity) values in the input stacks (and not due to
+% the Algorithm itself!).
+%
+% modified on 27.05.2022
+% by John Meshreki, john.meshreki@gmail.com
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% derived constants
 % size of measurement
