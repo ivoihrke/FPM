@@ -133,9 +133,7 @@ fprintf(['\nfinish loading images\n']);
 toc;
 
 %% define processing ROI
-%Np = [2160, 2560];
-Np = [344, 344];
-
+Np = [2160, 2560];
 
 %% read system parameters
 if strcmp(sample_name,'USAF') | strcmp(sample_name,'stained')
@@ -211,8 +209,7 @@ end
 %load('C:\Users\Muneeb\Desktop\ajmal fpm\laura\multiplexed fpm\Ns_cal289.mat\');
 % Ns_reorder = Ns(:,idx_led,:);
 % Ithresh_reorder = Ithresh_reorder(:,:,1:89);
-Ns_reorder = Ns(:,idx_led,:); %why?
-                              % 1st element is empty!
+Ns_reorder = Ns(:,idx_led,:); % 1st element is empty!
                               % 3rd element has the indicies of the k_u and k_v
                               % now store in 2nd element the NA-indicies
                               % idx_led is the NA-indices, e.g.
@@ -228,11 +225,6 @@ Nused = 293;
 idx_used = 1:Nused;
 I = Ithresh_reorder(:,:,idx_used);
 Ns2 = Ns_reorder(:,idx_used,:);
-
-
-f_test = figure('visible','off');imshow(uint16(Ithresh_reorder(:,:,5)));
-title('img of I_input_to_AlterMin, old_index==128, reordered_index==5; patched into 344x344');
-export_fig(f_test,strcat(out_dir,'I_input_to_AlterMin_index_128.png'),'-m4');
 
 %% reconstruction algorithm options: opts
 %   tol: maximum change of error allowed in two consecutive iterations
