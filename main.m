@@ -291,19 +291,19 @@ f88 = [];
 Np_Iter = ['Np_',num2str(Np(1)),'_',num2str(Np(2)),'_minIter_',num2str(opts.minIter),'_maxIter_',num2str(opts.maxIter)];
 
 real_O = real(O);
-imwrite(real_O, strcat(out_dir,'O_',Np_Iter,'_image.png'));
+imwrite(uint16(real_O), strcat(out_dir,'O_',Np_Iter,'_image.png'),'BitDepth',16);
 f1 = figure('visible','off');imshow(real_O);
 title('(O)');
 export_fig(f1,strcat(out_dir,'O_',Np_Iter,'_figure.png'),'-m4');
 
 angle_O = angle(O);
-imwrite(angle_O, strcat(out_dir,'angle_O_',Np_Iter,'_image.png'));
+imwrite(uint16(angle_O), strcat(out_dir,'angle_O_',Np_Iter,'_image.png'),'BitDepth',16);
 f2 = figure('visible','off');imshow(angle_O,[]);
 title('angle (O)');
 export_fig(f2,strcat(out_dir,'angle_O_',Np_Iter,'_figure.png'),'-m4');
 
 abs_O = abs(O);
-imwrite(abs_O, strcat(out_dir,'abs_O_',Np_Iter,'_image.png'));
+imwrite(uint16(abs_O), strcat(out_dir,'abs_O_',Np_Iter,'_image.png'),'BitDepth',16);
 f3 = figure('visible','off');imshow(abs_O,[]);
 title('abs (O)');
 export_fig(f3,strcat(out_dir,'abs_O_',Np_Iter,'_figure.png'),'-m4');
@@ -337,7 +337,7 @@ save(all_vars_matfile, '-v7.3');
 proc_abs_O = abs(O);
 proc_abs_O(abs(O)>25) = 25;
 %proc_abs_O(abs(O)>18) = 18;
-imwrite(proc_abs_O, strcat(out_dir,'proc_abs_O_',Np_Iter,'_image.png'));
+imwrite(uint16(proc_abs_O), strcat(out_dir,'proc_abs_O_',Np_Iter,'_image.png'),'BitDepth',16);
 f5 = figure('visible','off');imshow(proc_abs_O,[]);
 title(['processed abs (O)']);
 export_fig(f5,strcat(out_dir,'proc_abs_O_',Np_Iter,'_figure.png'),'-m4');
