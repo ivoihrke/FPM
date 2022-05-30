@@ -63,14 +63,11 @@ for i = 1:nrows
     end
 end
 
-
-W_Na = w_NA;
-dirac_cen = [3241,3841];
 toc;
 
 % saving the high res image for testing everything is loaded correctly
-imwrite(hig_res_O, strcat(out_dir,'high_res_O_image.png'));
-f1 = figure('visible','off');imshow(hig_res_O);
+imwrite(uint16(hig_res_O), strcat(out_dir,'high_res_O_image.png'),'BitDepth',16);
+f1 = figure('visible','off');imshow(hig_res_O,[]);
 title('(high res O)');
 export_fig(f1,strcat(out_dir,'high_res_O_figure.png'),'-m4');
 
@@ -92,23 +89,29 @@ hig_res_O_fourier = Ft(hig_res_O);
 %title('(high res fourier O)');
 %export_fig(f1,strcat(out_dir,'high_res_O_fourier_figure.png'),'-m4');
 
-%% define processing ROI
+%% define ROI, dirac positions and read pupil
 Np = [2160, 2560];
+%W_Na = w_NA;
+pupil = P;
 
+%% I_low_res_0147
+%dirac_cen = [3241,3841];
+% I_low_res_0149
+dirac_cen = [3241,3519];
 %% operator to crop region of O
 downsamp = @(x,cen) x(dirac_cen(1)-floor(Np(1)/2):dirac_cen(1)-floor(Np(1)/2)+Np(1)-1,...
     dirac_cen(2)-floor(Np(2)/2):dirac_cen(2)-floor(Np(2)/2)+Np(2)-1);
 
 % cropy and apply the circular filter(W_Na) at the dirac peak position 
-O_cropped = downsamp(hig_res_O_fourier,dirac_cen).*W_Na;
+O_cropped = downsamp(hig_res_O_fourier,dirac_cen).*P;
 
 % go to real space
-I_low_res_147 = real(F(O_cropped));
+I_low_res_149 = real(F(O_cropped));
 
 
 % saving the high res image in Fourier space
-imwrite(I_low_res_147, strcat(out_dir,'I_low_res_147_image.png'));
-f1 = figure('visible','off');imshow(I_low_res_147);
-title('(low res O 147)');
-export_fig(f1,strcat(out_dir,'I_low_res_147_figure.png'),'-m4');
+imwrite(uint16(I_low_res_149), strcat(out_dir,'I_low_res_149_image.png'),'BitDepth',16);
+f1 = figure('visible','off');imshow(I_low_res_149, []);
+title('(low res O 149)');
+export_fig(f1,strcat(out_dir,'I_low_res_149_figure.png'),'-m4');
 
