@@ -14,24 +14,6 @@ addpath('FP_Func/');
 %% specify which sample to use as input
 sample_name= 'USAF'; %'stained', 'USAF', 'hela'
 
-% map container of input directory path to
-% multiplex reading of low res image
-low_res_input_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
-{'../data/Tian14/1LED/tif/';...
-   '../data/Tian14_ResTarget/1LED/';...
-   '../data/Tian15_inVitroHeLa/data/'});
-
-low_res_filedir = low_res_input_dir_name(sample_name);
-
-% Generate the image list, in 'tif' image format (depending on your image format)
-low_res_imglist = dir([low_res_filedir,'Iled_149.tif']);
-
-fn = [low_res_filedir,low_res_imglist.name];
-disp(fn);
-
-% read low res image
-I_meas_low_res = double(imread(fn));
-
 
 %% map container of output directory path to
 out_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
@@ -59,7 +41,7 @@ high_res_input_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
 high_res_filedir = high_res_input_dir_name(sample_name);
 
 % load the big file to get w_NA
-load([high_res_filedir, 'wna.mat']);
+load([high_res_filedir, 'output_high_res.mat']);
 
 
 % all image data
@@ -108,36 +90,70 @@ Np = [2160, 2560];
 %W_Na = w_NA;
 pupil = P;
 
-%% I_low_res_0147
-%dirac_cen = [3241,3841];
-% I_low_res_0149
-dirac_cen = [3241,3519];
-%% operator to crop region of O
-downsamp = @(x,cen) x(dirac_cen(1)-floor(Np(1)/2):dirac_cen(1)-floor(Np(1)/2)+Np(1)-1,...
-    dirac_cen(2)-floor(Np(2)/2):dirac_cen(2)-floor(Np(2)/2)+Np(2)-1);
+%% Get dirac peaks positions
+% No. images
+Nimg=293;
 
-% cropy and apply the circular filter(W_Na) at the dirac peak position 
-O_cropped = downsamp(hig_res_O_fourier,dirac_cen).*P;
+% all intensities for estimated low res
+I_all_est_low_res = zeros(Np(1),Np(2),Nimg);
+% all intensities for measured low res
+I_all_meas_low_res = zeros(Np(1),Np(2),Nimg);
 
-% go to real space
-O_est_low_res_149 = F(O_cropped);
+for m = 1:Nimg
+    % map container of input directory path to
+    % multiplex reading of low res image
+    low_res_input_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
+    {'../data/Tian14/1LED/tif/';...
+       '../data/Tian14_ResTarget/1LED/';...
+       '../data/Tian15_inVitroHeLa/data/'});
 
-% get intensity from Object
-I_est_low_res_149 = abs(O_est_low_res_149).^2;
+    low_res_filedir = low_res_input_dir_name(sample_name);
 
-% saving the estimated low res
-imwrite(uint16(I_est_low_res_149), strcat(out_dir,'I_est_low_res_149_image.tif'));
-f_I_est_low_res_149 = figure('visible','off');imshow(I_est_low_res_149, []);
-title('(estimated low res I 149)');
-export_fig(f_I_est_low_res_149,strcat(out_dir,'I_est_low_res_149_figure.tif'),'-m4');
+    % Generate the image list, in 'tif' image format (depending on your image format)
+    low_res_imglist = dir([low_res_filedir,'Iled_',int2str(m),'.tif']);
 
-% saving the measured low res
-imwrite(uint16(I_meas_low_res), strcat(out_dir,'I_meas_low_res_image.tif'));
-f_I_meas_low_res = figure('visible','off');imshow(I_meas_low_res, []);
-title('(measured low res I 149)');
-export_fig(f_I_meas_low_res,strcat(out_dir,'I_meas_low_res_figure.tif'),'-m4');
+    fn = [low_res_filedir,low_res_imglist.name];
+    disp(fn);
+
+    % read low res image
+    I_meas_low_res = double(imread(fn));
+    
+    % save all measured low res intensities in one array
+    I_all_meas_low_res(:,:,m) = I_meas_low_res;
+
+    index_m = find(idx_led==m);
+    dirac_cen_pos = dirac_cen(index_m, :);
+
+    %% operator to crop region of O
+    downsamp = @(x,cen) x(dirac_cen_pos(1)-floor(Np(1)/2):dirac_cen_pos(1)-floor(Np(1)/2)+Np(1)-1,...
+        dirac_cen_pos(2)-floor(Np(2)/2):dirac_cen_pos(2)-floor(Np(2)/2)+Np(2)-1);
+
+    % cropy and apply the circular filter(W_Na) at the dirac peak position 
+    O_cropped = downsamp(hig_res_O_fourier,dirac_cen_pos).*P;
+
+    % go to real space
+    O_est_low_res = F(O_cropped);
+
+    % get estimated low res intensity from Object
+    I_est_low_res = abs(O_est_low_res).^2;
+    
+    % save all estimated low res intensities in one array
+    I_all_est_low_res(:,:,m) = I_est_low_res;
+
+    % saving the estimated low res
+    imwrite(uint16(I_est_low_res), strcat(out_dir,['I_est_low_res_',int2str(m),'_image.tif']));
+    %f_I_est_low_res_147 = figure('visible','off');imshow(I_est_low_res_147, []);
+    %title('(estimated low res I 147)');
+    %export_fig(f_I_est_low_res_147,strcat(out_dir,'I_est_low_res_147_figure.tif'),'-m4');
+
+    % saving the measured low res
+    imwrite(uint16(I_meas_low_res), strcat(out_dir,'I_meas_low_res_',int2str(m),'image.tif'));
+    %f_I_meas_low_res = figure('visible','off');imshow(I_meas_low_res, []);
+    %title('(measured low res I 147)');
+    %export_fig(f_I_meas_low_res,strcat(out_dir,'I_meas_low_res_figure.tif'),'-m4');
+end    
 
 
 % saving variables to matlab files
-low_res_both_meas_est_I_matfile = fullfile(out_dir, ['low_res_both_meas_est_I','.mat']);
-save(low_res_both_meas_est_I_matfile, 'I_est_low_res_149', 'I_meas_low_res', '-v7.3');
+%low_res_both_meas_est_I_matfile = fullfile(out_dir, ['low_res_both_meas_est_I','.mat']);
+%save(low_res_both_meas_est_I_matfile, 'I_all_est_low_res', 'I_all_meas_low_res', '-v7.3');
