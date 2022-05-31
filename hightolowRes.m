@@ -11,22 +11,29 @@ addpath('../dependencies/min_max_elements_index_n_values');
 % add path for functions files
 addpath('FP_Func/');
 
-% specify which sample to use as input
+%% specify which sample to use as input
 sample_name= 'USAF'; %'stained', 'USAF', 'hela'
 
 % map container of input directory path to
-% multiplex reading of images
-input_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
+% multiplex reading of low res image
+low_res_input_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
 {'../data/Tian14/1LED/tif/';...
-   '/home/ads/jm095624/microscopy3d/fourier_ptychography/out_dir/Tian14_ResTarget/28_05_2022/28_05_2022_19_13_42/';...
+   '../data/Tian14_ResTarget/1LED/';...
    '../data/Tian15_inVitroHeLa/data/'});
 
-filedir = input_dir_name(sample_name);
+low_res_filedir = low_res_input_dir_name(sample_name);
 
 % Generate the image list, in 'tif' image format (depending on your image format)
-imglist = dir([filedir,'O_Np_2160_2560_minIter_1_maxIter_3_image.png']);
+low_res_imglist = dir([low_res_filedir,'Iled_149.tif']);
 
-% map container of output directory path to
+fn = [low_res_filedir,low_res_imglist.name];
+disp(fn);
+
+% read low res image
+I_meas_low_res = double(imread(fn));
+
+
+%% map container of output directory path to
 out_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
 {strcat('../out_dir/Tian14_StainedHistologySlide/',todaysdate,'/',todaysdatetime,'/');...
     strcat('../out_dir/Tian14_ResTarget/',todaysdate,'/',todaysdatetime,'/');...
@@ -44,8 +51,15 @@ diary(strcat(out_dir,'/','log_',todaysdatetime,'.txt'));
 fprintf(['loading the high resolution image...\n']);
 tic;
 
+high_res_input_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
+{'../data/Tian14/1LED/tif/';...
+   '/home/ads/jm095624/microscopy3d/fourier_ptychography/out_dir/Tian14_ResTarget/28_05_2022/28_05_2022_19_13_42/';...
+   '../data/Tian15_inVitroHeLa/data/'});
+
+high_res_filedir = high_res_input_dir_name(sample_name);
+
 % load the big file to get w_NA
-load([filedir, 'wna.mat']);
+load([high_res_filedir, 'wna.mat']);
 
 
 % all image data
@@ -66,10 +80,10 @@ end
 toc;
 
 % saving the high res image for testing everything is loaded correctly
-imwrite(uint16(hig_res_O), strcat(out_dir,'high_res_O_image.png'),'BitDepth',16);
+imwrite(uint16(hig_res_O), strcat(out_dir,'high_res_O_image.tif'));
 f1 = figure('visible','off');imshow(hig_res_O,[]);
 title('(high res O)');
-export_fig(f1,strcat(out_dir,'high_res_O_figure.png'),'-m4');
+export_fig(f1,strcat(out_dir,'high_res_O_figure.tif'),'-m4');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -106,12 +120,24 @@ downsamp = @(x,cen) x(dirac_cen(1)-floor(Np(1)/2):dirac_cen(1)-floor(Np(1)/2)+Np
 O_cropped = downsamp(hig_res_O_fourier,dirac_cen).*P;
 
 % go to real space
-I_low_res_149 = real(F(O_cropped));
+O_est_low_res_149 = F(O_cropped);
+
+% get intensity from Object
+I_est_low_res_149 = abs(O_est_low_res_149).^2;
+
+% saving the estimated low res
+imwrite(uint16(I_est_low_res_149), strcat(out_dir,'I_est_low_res_149_image.tif'));
+f_I_est_low_res_149 = figure('visible','off');imshow(I_est_low_res_149, []);
+title('(estimated low res I 149)');
+export_fig(f_I_est_low_res_149,strcat(out_dir,'I_est_low_res_149_figure.tif'),'-m4');
+
+% saving the measured low res
+imwrite(uint16(I_meas_low_res), strcat(out_dir,'I_meas_low_res_image.tif'));
+f_I_meas_low_res = figure('visible','off');imshow(I_meas_low_res, []);
+title('(measured low res I 149)');
+export_fig(f_I_meas_low_res,strcat(out_dir,'I_meas_low_res_figure.tif'),'-m4');
 
 
-% saving the high res image in Fourier space
-imwrite(uint16(I_low_res_149), strcat(out_dir,'I_low_res_149_image.png'),'BitDepth',16);
-f1 = figure('visible','off');imshow(I_low_res_149, []);
-title('(low res O 149)');
-export_fig(f1,strcat(out_dir,'I_low_res_149_figure.png'),'-m4');
-
+% saving variables to matlab files
+low_res_both_meas_est_I_matfile = fullfile(out_dir, ['low_res_both_meas_est_I','.mat']);
+save(low_res_both_meas_est_I_matfile, 'I_est_low_res_149', 'I_meas_low_res', '-v7.3');
