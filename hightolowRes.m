@@ -96,6 +96,10 @@ Nimg=293;
 
 % all intensities for estimated low res
 I_all_est_low_res = zeros(Np(1),Np(2),Nimg);
+
+% all Object complex fields for estimated low res
+O_all_est_low_res = zeros(Np(1),Np(2),Nimg);
+
 % all intensities for measured low res
 I_all_meas_low_res = zeros(Np(1),Np(2),Nimg);
 
@@ -113,7 +117,7 @@ for m = 1:Nimg
     low_res_imglist = dir([low_res_filedir,'Iled_',int2str(m),'.tif']);
 
     fn = [low_res_filedir,low_res_imglist.name];
-    disp(fn);
+    %disp(fn);
 
     % read low res image
     I_meas_low_res = double(imread(fn));
@@ -130,9 +134,13 @@ for m = 1:Nimg
 
     % cropy and apply the circular filter(W_Na) at the dirac peak position 
     O_cropped = downsamp(hig_res_O_fourier,dirac_cen_pos).*P;
+    %O_cropped = hig_res_O_fourier,dirac_cen_pos.*P;
 
     % go to real space
     O_est_low_res = F(O_cropped);
+    
+    % save all estimated low res object complex fields in one array
+    O_all_est_low_res(:,:,m) = O_est_low_res;
 
     % get estimated low res intensity from Object
     I_est_low_res = abs(O_est_low_res).^2;
@@ -147,13 +155,14 @@ for m = 1:Nimg
     %export_fig(f_I_est_low_res_147,strcat(out_dir,'I_est_low_res_147_figure.tif'),'-m4');
 
     % saving the measured low res
-    imwrite(uint16(I_meas_low_res), strcat(out_dir,'I_meas_low_res_',int2str(m),'image.tif'));
+    imwrite(uint16(I_meas_low_res), strcat(out_dir,'I_meas_low_res_',int2str(m),'_image.tif'));
     %f_I_meas_low_res = figure('visible','off');imshow(I_meas_low_res, []);
     %title('(measured low res I 147)');
     %export_fig(f_I_meas_low_res,strcat(out_dir,'I_meas_low_res_figure.tif'),'-m4');
 end    
 
 
-% saving variables to matlab files
+% saving variables to matlab files (careful: huge output file, 
+% best to put an if cond when adding to the arrays to select a few images!)
 %low_res_both_meas_est_I_matfile = fullfile(out_dir, ['low_res_both_meas_est_I','.mat']);
 %save(low_res_both_meas_est_I_matfile, 'I_all_est_low_res', 'I_all_meas_low_res', '-v7.3');
