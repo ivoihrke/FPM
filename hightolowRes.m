@@ -55,16 +55,16 @@ load([high_res_filedir, 'output_high_res.mat']);
 hig_res_O = O; 
 
 %% remove the white pixels from the unprocessed O
-nrows = size(O, 1);
-ncols = size(O, 2);
+%nrows = size(O, 1);
+%ncols = size(O, 2);
 
-for i = 1:nrows
-    for j = 1:ncols
-      if abs(hig_res_O(i,j))>25
-        hig_res_O(i,j) = complex(25, imag(hig_res_O(i,j)));
-      end
-    end
-end
+%for i = 1:nrows
+%    for j = 1:ncols
+%      if abs(hig_res_O(i,j))>25
+%        hig_res_O(i,j) = complex(25, imag(hig_res_O(i,j)));
+%      end
+%    end
+%end
 
 toc;
 
@@ -140,11 +140,18 @@ for m = 1:Nimg
     % save all estimated low res intensities in one array
     I_all_est_low_res(:,:,m) = I_est_low_res;
 
-    % saving the estimated low res intensities
-    imwrite(uint16(I_est_low_res), strcat(out_dir,['I_est_low_res_',int2str(m),'_image.tif']));
+    % save the estimated low res ABSOLUTE (As is) intensities
+    %imwrite(uint16(I_est_low_res), strcat(out_dir,['I_est_low_res_',int2str(m),'_image.tif']));
+    
+    % save the estimated low res NORMALIZED intensities
+    save_tiff(mat2gray(I_est_low_res), strcat(out_dir,['I_normalised_est_low_res_',int2str(m),'_image.tif']));
 
-    % saving the measured low res intensities
-    imwrite(uint16(I_meas_low_res), strcat(out_dir,'I_meas_low_res_',int2str(m),'_image.tif'));
+    % saving the measured low res ABSOLUTE (As is) intensities
+    %imwrite(uint16(I_meas_low_res), strcat(out_dir,'I_meas_low_res_',int2str(m),'_image.tif'));
+    
+    % saving the measured low res NORMALIZED intensities
+    save_tiff(mat2gray(I_meas_low_res), strcat(out_dir,['I_normalised_meas_low_res_',int2str(m),'_image.tif']));
+    
 end    
 
 %% saving variables to matlab files (careful: huge output file, 
