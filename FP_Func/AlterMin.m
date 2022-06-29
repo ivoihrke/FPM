@@ -269,6 +269,7 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         psi0 = Ft(Psi_scale); 
 
 %         psistack(:,:,m) = psi0;
+        low_res_O(:,:, m) = psi0;
         % estimated intensity w/o correction term 
         I_est = sum(abs(psi0).^2,3); %remember multiplex setting has r0 channels for r0 LEDs that are on, need to sum them, Eq. 2, Tian'14 -- this is complex 
 
@@ -292,6 +293,7 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
                 GDUpdate_Multiplication_rank_r(O,P,dpsi,Omax,cen,Ps,...
                 opts.OP_alpha,opts.OP_beta);
         end
+        
         %the actual application of the projection 2 
         [O,P] = P2(O,P,dPsi./repmat(H0,[1,1,r0]),Omax,cen);
 
@@ -314,7 +316,12 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
                 cen(:,1)-sp0/3,cen(:,1)+sp0/3,[],[1,2],optsanneal);
             Ns(:,m,:) = cen0-cen_correct;
         end
-
+        
+        % add to stack of measured intesnitites
+        I_meas_stack(:,:, m) = I_mea;
+        % add to stack of measured intesnitites
+        I_est_stack(:,:, m) = I_est;
+        
         %------------- final error --------------------
 
         % compute the total difference to determine stopping criterion
@@ -341,6 +348,14 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
     end
     %end
     
+
+    % saving intensities to check error
+    err_check_matfile = fullfile(opts.out_dir, ['err_check_','R_',num2str(iter),'.mat']);
+    save(err_check_matfile, 'I_meas_stack', 'I_est_stack', '-v7.3');
+    low_res_matfile = fullfile(opts.out_dir, ['low_res_','R_',num2str(iter),'.mat']);
+    save(low_res_matfile, 'low_res_O', 'low_res_O', '-v7.3');
+
+
     %% compute error
     % record the error and can check the convergence later.
     err = [err,err2];

@@ -35,8 +35,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % use today's date to create new output directory
-todaysdatetime = string(datetime('now','Format','dd_MM_yyyy_HH_mm_ss'));
-todaysdate = string(datetime('today','Format','dd_MM_yyyy'));
+todaysdatetime = string(datetime('now','Format','yyyy_MM_dd_HH_mm_ss'));
+todaysdate = string(datetime('today','Format','yyyy_MM_dd'));
 
 
 
@@ -46,7 +46,7 @@ addpath('../dependencies/natsortfiles');
 addpath('../dependencies/export_fig');
 addpath('../dependencies/labelpoints');
 addpath('../dependencies/min_max_elements_index_n_values');
-
+addpath('../dependencies/normalize_img');
 
 % add path for functions files
 addpath('FP_Func/');
@@ -107,6 +107,7 @@ for m = 1:Nimg
     disp(fn);
     % all image data
     I = double(imread(fn));
+    %I = normalize_img(I); % normalize measured image
     Iall(:,:,m) = I  ; %filling 3d array by replacing zeros in 1st&2nd elements by the image values and 3rd element is index of image
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -134,6 +135,8 @@ toc;
 
 %% define processing ROI
 Np = [2160, 2560];
+%Np = [344, 344];
+
 
 %% read system parameters
 if strcmp(sample_name,'USAF') | strcmp(sample_name,'stained')
@@ -251,7 +254,7 @@ Ns2 = Ns_reorder(:,idx_used,:);
     % caution: takes consierably much longer time to compute a single iteration
 %   F, Ft: operators of Fourier transform and inverse
 opts.tol = 1;
-opts.maxIter = 3; 
+opts.maxIter = 10; 
 opts.minIter = 1;
 opts.monotone = 1;
 % 'full', display every subroutin,
