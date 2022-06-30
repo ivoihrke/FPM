@@ -1,4 +1,4 @@
-function [O, P, err, scale, Ns] = AlterMin( I, No, Ns, opts)
+function [O, P, dirac_cen, err, scale, Ns] = AlterMin( I, No, Ns, opts)
 fprintf('in the AlteMin fnc\n');
 %AlterMin Implements alternating minimization sequentially on a stack of
 %measurement I (n1 x n2 x nz). It consists of 2 loop. The main loop update
@@ -242,6 +242,9 @@ fprintf('| %2d   | %.2e |\n',iter,err1);
 sp0 = max(row(abs(Ns(:,1,:)-Ns(:,2,:))));
 
 dirac_cen = zeros(293,2); %dirac positions corresponding to each image
+
+I_meas_stack = zeros(Np(1),Np(2), 293); % measured images stack
+
 while abs(err1-err2)>opts.tol&&iter<opts.maxIter
 %     psistack = zeros(64,64,293);
     fprintf('iter: %d \n', iter);
@@ -295,7 +298,6 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         
         %the actual application of the projection 2 
         [O,P] = P2(O,P,dPsi./repmat(H0,[1,1,r0]),Omax,cen);
-
         
         % ----------------- additional functionality of estimating updates to idealized LED positions --------------
         %    - Yeh et al. 2015
@@ -364,13 +366,10 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
 end
 
 % saving measured intensities
-I_meas_stack = fullfile(opts.out_dir, 'I_meas_stack.mat');
-save(I_meas_stack, 'I_meas_stack', '-v7.3');
+I_meas_stack_matfile = fullfile(opts.out_dir, 'I_meas_stack.mat');
+save(I_meas_stack_matfile, 'I_meas_stack', '-v7.3');
 
-%saving high res and dirac peak positions as matfile & figure
-hig_res_O_matfile = fullfile(opts.out_dir, ['high_res_O','.mat']);
-save(hig_res_O_matfile, 'O', 'P', 'dirac_cen', 'idx_led', 'Np', '-v7.3');
-
+% saving dirac peakw image
 f_edirac_peaks = figure('visible','off');
 scatter(dirac_cen(:,1), dirac_cen(:,2))
 labelpoints(dirac_cen(:,1), dirac_cen(:,2), string(opts.idx_led(:)), 'FontSize', 6);
