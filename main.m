@@ -256,7 +256,7 @@ Ns2 = Ns_reorder(:,idx_used,:);
     % caution: takes consierably much longer time to compute a single iteration
 %   F, Ft: operators of Fourier transform and inverse
 opts.tol = 1;
-opts.maxIter = 2; 
+opts.maxIter = 10; 
 opts.minIter = 1;
 opts.monotone = 1;
 % 'full', display every subroutin,
