@@ -1,6 +1,6 @@
 %% helper functions
 %Fourier and inverse Transforms
-F = @(x) fftshift(fft2(x));
+F = @(x) fftshift(fft2(ifftshift(x)));
 Ft = @(x) fftshift(ifft2(ifftshift(x)));
 
 % operator to crop region of O
@@ -9,8 +9,8 @@ downsamp = @(x,cen,Np) x(cen(1)-floor(Np(1)/2):cen(1)-floor(Np(1)/2)+Np(1)-1,...
 
 %% Specify dependencies and Date/time tags
 % use today's date to create new output directory
-todaysdatetime = string(datetime('now','Format','dd_MM_yyyy_HH_mm_ss'));
-todaysdate = string(datetime('today','Format','dd_MM_yyyy'));
+todaysdatetime = string(datetime('now','Format','yyyy_MM_dd_HH_mm_ss'));
+todaysdate = string(datetime('today','Format','yyyy_MM_dd'));
 
 % add path to dependencies
 addpath('../dependencies/natsortfiles');
@@ -42,33 +42,22 @@ tic;
 
 high_res_input_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
 {'../data/Tian14/1LED/tif/';...
-   '/home/ads/jm095624/microscopy3d/fourier_ptychography/out_dir/Tian14_ResTarget/28_05_2022/28_05_2022_19_13_42/';...
+   %'/home/ads/jm095624/microscopy3d/fourier_ptychography/out_dir/Tian14_ResTarget/28_05_2022/28_05_2022_19_13_42/';...
+   '/home/ads/jm095624/microscopy3d/fourier_ptychography/out_dir/Tian14_ResTarget/2022_06_29/2022_06_29_17_56_18/';...
    '../data/Tian15_inVitroHeLa/data/'});
 
 high_res_filedir = high_res_input_dir_name(sample_name);
 
-% load the big file to get w_NA
+% load the high res file
 load([high_res_filedir, 'output_high_res.mat']);
 
 
 % high res complex field
 hig_res_O = O; 
 
-%% remove the white pixels from the unprocessed O
-%nrows = size(O, 1);
-%ncols = size(O, 2);
-
-%for i = 1:nrows
-%    for j = 1:ncols
-%      if abs(hig_res_O(i,j))>25
-%        hig_res_O(i,j) = complex(25, imag(hig_res_O(i,j)));
-%      end
-%    end
-%end
-
 toc;
 
-%% saving the high res image for testing everything is loaded correctly
+%% saving the high res image for testing it is loaded correctly
 imwrite(uint16(hig_res_O), strcat(out_dir,'high_res_O_image.tif'));
 f1 = figure('visible','off');imshow(hig_res_O,[]);
 title('(high res O)');
@@ -76,49 +65,29 @@ export_fig(f1,strcat(out_dir,'high_res_O_figure.tif'),'-m4');
 
 
 %% go to Fourier space
-hig_res_O_fourier = Ft(hig_res_O);
+hig_res_O_fourier = F(hig_res_O);
 
 
 %% define ROI, read pupil, and no. of images
 Np = [2160, 2560];
-%W_Na = w_NA;
 
-pupil = P;
+P = P;
 
 % No. images
 Nimg=293;
+
+% read led indices
+idx_led = idx_led;
+
+%read dirac centers
+dirac_cen = dirac_cen;
 
 %% Estimate low res from high res
 
 % all intensities for estimated low res
 I_all_est_low_res = zeros(Np(1),Np(2),Nimg);
 
-% all Object complex fields for estimated low res
-O_all_est_low_res = zeros(Np(1),Np(2),Nimg);
-
-% all intensities for measured low res
-I_all_meas_low_res = zeros(Np(1),Np(2),Nimg);
-
 for m = 1:Nimg
-    % map container of input directory path to
-    % multiplex reading of low res image
-    low_res_input_dir_name = containers.Map({'stained'; 'USAF'; 'hela'},...
-    {'../data/Tian14/1LED/tif/';...
-       '../data/Tian14_ResTarget/1LED/';...
-       '../data/Tian15_inVitroHeLa/data/'});
-
-    low_res_filedir = low_res_input_dir_name(sample_name);
-
-    % Generate the image list, in 'tif' image format (depending on your image format)
-    low_res_imglist = dir([low_res_filedir,'Iled_',int2str(m),'.tif']);
-
-    fn = [low_res_filedir,low_res_imglist.name];
-
-    % read low res image
-    I_meas_low_res = double(imread(fn));
-    
-    % save all measured low res intensities in one array
-    I_all_meas_low_res(:,:,m) = I_meas_low_res;
 
     % find Dirac peak position for image m (1 LED per image)
     index_m = find(idx_led==m);
@@ -129,32 +98,19 @@ for m = 1:Nimg
     O_cropped = downsamp(hig_res_O_fourier,dirac_cen_pos,Np).*P;
 
     % go to real space
-    O_est_low_res = F(O_cropped);
-    
-    % save all estimated low res Object complex fields in one array
-    O_all_est_low_res(:,:,m) = O_est_low_res;
+    O_est_low_res = Ft(O_cropped);
 
     % get estimated low res intensity from Object
     I_est_low_res = abs(O_est_low_res).^2;
     
     % save all estimated low res intensities in one array
     I_all_est_low_res(:,:,m) = I_est_low_res;
-
-    % save the estimated low res ABSOLUTE (As is) intensities
-    %imwrite(uint16(I_est_low_res), strcat(out_dir,['I_est_low_res_',int2str(m),'_image.tif']));
     
-    % save the estimated low res NORMALIZED intensities
-    save_tiff(mat2gray(I_est_low_res), strcat(out_dir,['I_normalised_est_low_res_',int2str(m),'_image.tif']));
-
-    % saving the measured low res ABSOLUTE (As is) intensities
-    %imwrite(uint16(I_meas_low_res), strcat(out_dir,'I_meas_low_res_',int2str(m),'_image.tif'));
-    
-    % saving the measured low res NORMALIZED intensities
-    save_tiff(mat2gray(I_meas_low_res), strcat(out_dir,['I_normalised_meas_low_res_',int2str(m),'_image.tif']));
-    
+    %% saving variables to matlab files (save every 10 images together!) 
+    if rem(m,10)==0 | m==293
+        fprintf('\nfinished m = %2d images\n', m);
+        low_res_est_I_matfile = fullfile(strcat(out_dir,'low_res_est_I_till_m_',num2str(m),'.mat'));
+        save(low_res_est_I_matfile, 'I_all_est_low_res', '-v7.3');
+    end
 end    
 
-%% saving variables to matlab files (careful: huge output file, 
-% best to put an if cond when adding to the arrays to select a few images!)
-%low_res_both_meas_est_I_matfile = fullfile(out_dir, ['low_res_both_meas_est_I','.mat']);
-%save(low_res_both_meas_est_I_matfile, 'I_all_est_low_res', 'I_all_meas_low_res', '-v7.3');
