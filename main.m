@@ -356,3 +356,17 @@ fprintf('\nGetting/saving low res intensities\n');
 hightolowRes(O,P,dirac_cen,idx_led,Np,opts);
 
 fprintf('processing completes\n');
+
+% writing README
+readmef = fopen( strcat(out_dir,'/','README.txt'), 'wt' );
+
+fprintf('\nwriting the README file.\n');
+fprintf(readmef, '\nThis directory has the measured & estimated images of size %2d x %2d.\n', Np(1), Np(2));
+for j=1:20, fprintf(readmef,'-'); end
+fprintf(readmef,'\n');
+fprintf(readmef,'\nParamters used for these computed images:\n');
+fprintf(readmef,'\nNp: %2d x %2d.\n', Np(1), Np(2));
+fprintf(readmef,'\nminIter: %2d.\n', opts.minIter);
+fprintf(readmef,'\nmaxIter: %2d.\n', opts.maxIter);
+
+fclose(readmef);
