@@ -1,3 +1,10 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This file is to convert the high resolution image
+% into low resolution images with the knowledge of their
+% corresponding dirac peak positions.
+%
+% by John Meshreki, john.meshreki@gmail.com
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% helper functions
 %Fourier and inverse Transforms
 F = @(x) fftshift(fft2(ifftshift(x)));
