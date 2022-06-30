@@ -101,8 +101,8 @@ if nargin<4
     opts.H0 = ones(Np); % this is an extension to Tian14, the pupil function P is represented as a product of known and unknown components (P0*H0), where H0 can be user-supplied, and P0 is estimated below
     opts.poscalibrate = 0; % optimize the user-provided positions of the LEDs ? (stored in Ns)
     opts.calbratetol = 1e-1;
-    opts.F = @(x) fftshift(fft2(x));   %define FT  --> this is different from calling alterMin with >=5 params ?? - probably an error
-    opts.Ft = @(x) ifft2(ifftshift(x)); %inverse FT  --> this is different from calling alterMin with >=5 params ?? - probably an error
+    opts.F = @(x) fftshift(fft2(ifftshift(x)));
+    opts.Ft = @(x) fftshift(ifft2(ifftshift(x)));
 else
     if ~isfield(opts,'tol')
         opts.tol = 1;

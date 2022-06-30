@@ -18,8 +18,8 @@
 % Lei Tian (lei_tian@alum.mit.edu)
 
 
-F = @(x) fftshift(fft2(x));
-Ft = @(x) ifft2(ifftshift(x));
+F = @(x) fftshift(fft2(ifftshift(x)));
+Ft = @(x) fftshift(ifft2(ifftshift(x)));
 row = @(x) x(:).';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
