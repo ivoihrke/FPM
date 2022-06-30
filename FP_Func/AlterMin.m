@@ -269,7 +269,6 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         psi0 = Ft(Psi_scale); 
 
 %         psistack(:,:,m) = psi0;
-        low_res_O(:,:, m) = psi0;
         % estimated intensity w/o correction term 
         I_est = sum(abs(psi0).^2,3); %remember multiplex setting has r0 channels for r0 LEDs that are on, need to sum them, Eq. 2, Tian'14 -- this is complex 
 
@@ -319,8 +318,6 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         
         % add to stack of measured intesnitites
         I_meas_stack(:,:, m) = I_mea;
-        % add to stack of measured intesnitites
-        I_est_stack(:,:, m) = I_est;
         
         %------------- final error --------------------
 
@@ -347,14 +344,6 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         drawnow;
     end
     %end
-    
-
-    % saving intensities to check error
-    err_check_matfile = fullfile(opts.out_dir, ['err_check_','R_',num2str(iter),'.mat']);
-    save(err_check_matfile, 'I_meas_stack', 'I_est_stack', '-v7.3');
-    low_res_matfile = fullfile(opts.out_dir, ['low_res_','R_',num2str(iter),'.mat']);
-    save(low_res_matfile, 'low_res_O', 'low_res_O', '-v7.3');
-
 
     %% compute error
     % record the error and can check the convergence later.
@@ -374,9 +363,14 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
     
 end
 
-%saving dirac peak positions as matfile & figure
-all_vars_matfile = fullfile(opts.out_dir, ['dirac_cen','.mat']);
-save(all_vars_matfile, 'dirac_cen', 'cen0', 'Ns');
+% saving measured intensities
+I_meas_stack = fullfile(opts.out_dir, 'I_meas_stack.mat');
+save(I_meas_stack, 'I_meas_stack', '-v7.3');
+
+%saving high res and dirac peak positions as matfile & figure
+hig_res_O_matfile = fullfile(opts.out_dir, ['high_res_O','.mat']);
+save(hig_res_O_matfile, 'O', 'P', 'dirac_cen', 'idx_led', 'Np', '-v7.3');
+
 f_edirac_peaks = figure('visible','off');
 scatter(dirac_cen(:,1), dirac_cen(:,2))
 labelpoints(dirac_cen(:,1), dirac_cen(:,2), string(opts.idx_led(:)), 'FontSize', 6);

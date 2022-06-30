@@ -326,14 +326,12 @@ ylabel('log err');
 export_fig(f_err_log,strcat(out_dir,'err_log_',Np_Iter,'.png'),'-m4');
 
 
-% saving variables to matlab files
-hig_res_O_matfile = fullfile(out_dir, ['hig_res_O_',Np_Iter,'.mat']);
-save(hig_res_O_matfile, 'O', 'real_O', '-v7.3');
-all_vars_matfile = fullfile(out_dir, ['all_vars_',Np_Iter,'.mat']);
-%save(all_vars_matfile);
-save(all_vars_matfile, '-v7.3');
+%% saving variables to matlab files
+%all_vars_matfile = fullfile(out_dir, ['all_vars_',Np_Iter,'.mat']);
+%%save(all_vars_matfile);
+%save(all_vars_matfile, '-v7.3');
 % To save all but some large variables,e.g. I, Iall,etc (uncomment next line)
-%save(all_vars_matfile, '-regexp','^(?!(I|Iall|Imea_reorder|Ithresh_reorder)$).');
+%%save(all_vars_matfile, '-regexp','^(?!(I|Iall|Imea_reorder|Ithresh_reorder)$).');
 
 
 %post-processing of the white pixels w/ high intensity
