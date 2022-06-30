@@ -47,6 +47,8 @@ addpath('../dependencies/export_fig');
 addpath('../dependencies/labelpoints');
 addpath('../dependencies/min_max_elements_index_n_values');
 addpath('../dependencies/normalize_img');
+addpath('../dependencies/imwrite2tif');
+
 
 % add path for functions files
 addpath('FP_Func/');
@@ -343,6 +345,7 @@ proc_abs_O = abs(O);
 proc_abs_O(abs(O)>25) = 25;
 %proc_abs_O(abs(O)>18) = 18;
 imwrite(uint16(proc_abs_O), strcat(out_dir,'proc_abs_O_',Np_Iter,'_image.png'),'BitDepth',16);
+
 f5 = figure('visible','off');imshow(proc_abs_O,[]);
 title(['processed abs (O)']);
 export_fig(f5,strcat(out_dir,'proc_abs_O_',Np_Iter,'_figure.png'),'-m4');

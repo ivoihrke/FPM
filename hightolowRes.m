@@ -83,6 +83,9 @@ for m = 1:Nimg
     % save all estimated low res intensities in one array
     I_est_stack(:,:,m) = I_est;
     
+    % saving them as TIFF images
+    imwrite2tif(I_est, [], convertStringsToChars(strcat(opts.out_dir,'I_est_',num2str(m),'_image.tiff')), 'single','Compression',1);
+
     %% saving variables to matlab files (save every 10 images together!) 
     %    save(low_res_est_I_matfile, 'I_all_est_low_res', '-v7.3');
     %if rem(m,10)==0 | m==293

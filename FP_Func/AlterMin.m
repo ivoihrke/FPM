@@ -267,7 +267,7 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         end
         % measured intensity
         I_mea = I(:,:,m); %taken from input stack
-
+        
         % compute field in real space
         psi0 = Ft(Psi_scale); 
 
@@ -321,6 +321,11 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         % add to stack of measured intesnitites
         I_meas_stack(:,:, m) = I_mea;
         
+        m_b4_sorting = opts.idx_led(m); % original id before NA sorting       
+        % saving them as TIFF images
+        imwrite2tif(I_mea, [], convertStringsToChars(strcat(opts.out_dir,'I_meas_',num2str(m_b4_sorting),'_image.tiff')), 'single','Compression',1);
+
+        
         %------------- final error --------------------
 
         % compute the total difference to determine stopping criterion
@@ -365,9 +370,10 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
     
 end
 
-% saving measured intensities
+% saving measured intensities in matfile
 I_meas_stack_matfile = fullfile(opts.out_dir, 'I_meas_stack.mat');
 save(I_meas_stack_matfile, 'I_meas_stack', '-v7.3');
+
 
 % saving dirac peakw image
 f_edirac_peaks = figure('visible','off');
