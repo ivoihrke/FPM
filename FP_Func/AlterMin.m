@@ -323,7 +323,7 @@ while abs(err1-err2)>opts.tol&&iter<opts.maxIter
         
         m_b4_sorting = opts.idx_led(m); % original id before NA sorting       
         % saving them as TIFF images
-        imwrite2tif(I_mea, [], convertStringsToChars(strcat(opts.out_dir,'I_meas_',num2str(m_b4_sorting),'_image.tiff')), 'single','Compression',1);
+        %imwrite2tif(I_mea, [], convertStringsToChars(strcat(opts.out_dir,'I_meas_',num2str(m_b4_sorting),'_image.tiff')), 'single','Compression',1);
 
         
         %------------- final error --------------------

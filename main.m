@@ -353,7 +353,10 @@ export_fig(f5,strcat(out_dir,'proc_abs_O_',Np_Iter,'_figure.png'),'-m4');
 fprintf('\nfinished Altermin.m\n');
 fprintf('\nGetting/saving low res intensities\n');
 
-hightolowRes(O,P,dirac_cen,idx_led,Np,opts);
+%%%%%
+% this is to go from high resolution to low resolution
+%hightolowRes(O,P,dirac_cen,idx_led,Np,opts);
+%%%%%%
 
 fprintf('processing completes\n');
 
